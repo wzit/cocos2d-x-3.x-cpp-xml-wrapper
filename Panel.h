@@ -28,7 +28,7 @@ class Panel : public Node
 	CREATE_0(Panel);
 	CREATE_1(Panel);
 	CREATE_2(Panel);
-	bool init();
+	virtual bool init()override;
 	bool init( const std::string& folder );
 	bool init( const std::string& folder, const Size& size );
 public:

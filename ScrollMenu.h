@@ -25,12 +25,12 @@ class ScrollMenu : public Scissor<Layer>
 {
 	DECLARE_BUILDER( ScrollMenu );
 	CREATE_0(ScrollMenu);
-	bool init();
+	virtual bool init()override;
 public:
-	bool onTouchBegan( Touch*, Event* );
-	void onTouchEnded( Touch*, Event* );
-	void onTouchMoved( Touch*, Event* );
-	void onTouchCancelled( Touch*, Event* );
+	virtual bool onTouchBegan( Touch*, Event* )override;
+	virtual void onTouchEnded( Touch*, Event* )override;
+	virtual void onTouchMoved( Touch*, Event* )override;
+	virtual void onTouchCancelled( Touch*, Event* )override;
 
 	void setEnabled( bool var );
 	bool isEnabled()const;

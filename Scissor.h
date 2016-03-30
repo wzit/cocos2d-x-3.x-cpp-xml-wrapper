@@ -44,19 +44,19 @@ public:
 		_conteiner->setCascadeOpacityEnabled( true );
 	};
 
-	virtual void onEnter()
+	virtual void onEnter()override
 	{
 		T::onEnter();
 		_conteiner->onEnter();
 	}
 
-	virtual void onExit()
+	virtual void onExit()override
 	{
 		T::onExit();
 		_conteiner->onExit();
 	}
 
-	virtual void visit( Renderer *renderer, const Mat4& parentTransform, uint32_t parentFlags )
+	virtual void visit( Renderer *renderer, const Mat4& parentTransform, uint32_t parentFlags )override
 	{
 		if( Node::isVisible() )
 		{
@@ -91,25 +91,6 @@ public:
 		return _frame;
 	}
 
-	/*
-	virtual void addChild( Node * child ) override
-	{
-		_childAddToConteiner ? _conteiner->addChild( child ) : Node::addChild( child );
-	}
-	virtual void addChild( Node * child, int zOrder ) override
-	{
-		_childAddToConteiner ? _conteiner->addChild( child, zOrder ) : Node::addChild( child, zOrder );
-	}
-	virtual void addChild( Node * child, int zOrder, int tag ) override
-	{
-		_childAddToConteiner ? _conteiner->addChild( child, zOrder, tag ) : Node::addChild( child, zOrder, tag );
-	}
-	virtual void addChild( Node * child, int zOrder, const std::string &name ) override
-	{
-		_childAddToConteiner ? _conteiner->addChild( child, zOrder, name ) : Node::addChild( child, zOrder, name );
-	}
-	*/
-
 	virtual void addChild(Node * child)override
 	{
 		_childAddToConteiner ? _conteiner->addChild( child ) : Node::addChild( child );
@@ -126,8 +107,6 @@ public:
 	{
 		_childAddToConteiner ? _conteiner->addChild( child, localZOrder, name ) : Node::addChild( child, localZOrder, name );
 	}
-
-
 
 	virtual void addChildNotScissor( Node * child )
 	{
@@ -155,9 +134,9 @@ public:
 		_childAddToConteiner = true;
 	}
 
-	virtual Vector<Node*>& getChildren() { return _conteiner->getChildren(); }
-	virtual const Vector<Node*>& getChildren() const { return _conteiner->getChildren(); }
-	virtual ssize_t getChildrenCount() const { return _conteiner->getChildrenCount(); }
+	virtual Vector<Node*>& getChildren() override { return _conteiner->getChildren(); }
+	virtual const Vector<Node*>& getChildren() const override { return _conteiner->getChildren(); }
+	virtual ssize_t getChildrenCount() const override { return _conteiner->getChildrenCount(); }
 
 	bool checkTouchInScissorArea( const Point & point )
 	{
@@ -168,7 +147,7 @@ public:
 	NodePointer getScissorConteiner() { return _conteiner; }
 	const NodePointer getScissorConteiner()const { return _conteiner; }
 protected:
-	void updateDisplayedOpacity( GLubyte parentOpacity )
+	virtual void updateDisplayedOpacity( GLubyte parentOpacity )override
 	{
 		T::_displayedOpacity = T::_realOpacity * parentOpacity / 255.0;
 		T::updateColor( );

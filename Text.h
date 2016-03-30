@@ -26,7 +26,7 @@ class Text : public Label, public NodeExt
 	CREATE_0(Text);
 	CREATE_2(Text);
 	CREATE_5(Text);
-	bool init();
+	bool init()override;
 	bool init( const std::string& font, const std::string& text, float width = 0, TextHAlignment alignment = TextHAlignment::LEFT, const Vec2& imageOffset = Vec2::ZERO );
 public:
 	virtual void setString( const std::string& newString ) override;

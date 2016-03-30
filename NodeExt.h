@@ -45,7 +45,7 @@ public:
 protected:
 	NodeExt();
 	virtual ~NodeExt();
-	virtual bool init();
+	bool init();
 
 public:
 	virtual void load( const std::string & directory, const std::string & xmlFile )final;
@@ -71,7 +71,7 @@ class LayerExt: public Layer, public NodeExt
 {
 	DECLARE_BUILDER( LayerExt );
 	CREATE_0(LayerExt);
-	bool init();
+	virtual bool init() override;
 public:
 	virtual void onEnter()override;
 	SmartScene* getSmartScene();

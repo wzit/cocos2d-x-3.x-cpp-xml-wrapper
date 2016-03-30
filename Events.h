@@ -139,9 +139,9 @@ class EventCreateNode : public EventBase
 	CREATE_0( EventCreateNode );
 	bool init();
 public:
-	virtual void execute( NodeExt * context );
-	virtual void setParam( const std::string & name, const std::string & value );
-	virtual std::string getParam( const std::string & name );
+	virtual void execute( NodeExt * context )override;
+	virtual void setParam( const std::string & name, const std::string & value )override;
+	virtual std::string getParam( const std::string & name )override;
 	virtual bool loadXmlEntity( const std::string& tag, const pugi::xml_node& node )override;
 private:
 	struct PositionInfo

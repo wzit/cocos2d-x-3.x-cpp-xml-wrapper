@@ -46,6 +46,8 @@ void ServicePlugin::cacheRewardedVideo()
 		case Service::fyber:
 			fyber::cacheVideo();
 			break;
+		default:
+			break;
 	}
 }
 
@@ -59,6 +61,9 @@ void ServicePlugin::cacheInterstitial()
 		case Service::fyber:
 			fyber::cacheInterstitial();
 			break;
+		default:
+			break;
+
 	}
 }
 
@@ -76,7 +81,7 @@ void ServicePlugin::showBanner()
 			appodeal::showBanner();
 			break;
 		default:
-			assert( 0 );
+			break;
 	}
 }
 
