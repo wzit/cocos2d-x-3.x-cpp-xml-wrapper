@@ -12,6 +12,7 @@
 #include "Purchase.h"
 #include "ml/common.h"
 #include "ml/ParamCollection.h"
+#include "ml/IntrusivePtr.h"
 
 #include "cocos2d.h"
 #include "2d/CCFontAtlasCache.h"
@@ -19,9 +20,13 @@
 
 USING_NS_CC;
 
+
 static inapp::CallBackPurchase _callback_purchase;
 static inapp::CallBackRequestDetails _callback_details;
 static bool _locked = false;
+static std::mutex _mutex;
+static inapp::PurchaseResult _boughtResult;
+static bool _boughtProduct;
 
 namespace
 {
@@ -45,6 +50,15 @@ void inapp::details( const std::string & productID, const CallBackRequestDetails
 
 void inapp::purchase( const std::string & product, const CallBackPurchase & callback )
 {
+	static bool update( true );
+	if( update )
+	{
+		static IntrusivePtr<Node> dummy( Node::create() );
+		auto scheduler = Director::getInstance()->getScheduler();
+		auto callback = std::bind( inapp::mainThreadUpdate, std::placeholders::_1 );
+		scheduler->schedule( callback, dummy.ptr(), 0, false, "inapps" );
+		update = false;
+	}
 	if( _locked == false )
 	{
 		_locked = true;
@@ -67,8 +81,21 @@ void inapp::requestResultsDetails( const SkuDetails& result )
 
 void inapp::requestResultsPurchase( PurchaseResult result )
 {
-	if( _callback_purchase )
-		_callback_purchase( result );
+	_mutex.lock();
+	_boughtProduct = true;
+	_boughtResult = result;
+	_mutex.unlock();
 	_locked = false;
+}
 
+void inapp::mainThreadUpdate( float dt )
+{
+	_mutex.lock();
+	if( _boughtProduct )
+	{
+		if( _callback_purchase )
+			_callback_purchase( _boughtResult );
+		_boughtProduct = false;
+	}
+	_mutex.unlock();
 }

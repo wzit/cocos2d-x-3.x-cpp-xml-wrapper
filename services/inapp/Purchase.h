@@ -82,6 +82,8 @@ public:
 private:
 	static void requestPurchase( const std::string & productID );
 	static void requestDetails( const std::string & productID );
+	static void mainThreadUpdate( float dt );
+private:
 };
 
 
