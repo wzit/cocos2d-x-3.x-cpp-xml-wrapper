@@ -54,7 +54,9 @@ services/plugins/ServicePlugin.cpp \
 services/adcolony/adcolony_android.cpp \
 services/unityads/unityads_android.cpp \
 services/appodeal/appodeal_android.cpp \
-services/fyber/fyber_android.cpp
+services/fyber/fyber_android.cpp \
+services/facebook/facebook.cpp \
+services/facebook/facebook_android.cpp
 
 LOCAL_C_INCLUDES += $(LOCAL_PATH)/..
 
