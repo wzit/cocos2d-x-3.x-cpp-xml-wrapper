@@ -352,18 +352,13 @@ void appendToFile( const std::string & pathToCryptoFile, const std::string & afi
 XmlDocPointer loadDoc( const std::string& datFile_, const std::string& file )
 {
 	auto doc = std::make_shared<pugi::xml_document>();
-#if USE_DATFILES == 1
+
 	std::string datFile;
-	//if( datFile_.find( "ini/" ) == 0 )
-	//	datFile = "dat/" + file.substr( 4, file.size() - 8 ) + ".dat";
-	//else
-	//	datFile = datFile_;
 	if( datFile_.empty() == false )
 		datFile = datFile_;
 	else if( file.find( "ini/" ) == 0 )
 		datFile = "dat/" + file.substr( 4, file.size() - 8 ) + ".dat";
 
-	
 #if CC_TARGET_PLATFORM == CC_PLATFORM_WIN32
 	if( FileUtils::getInstance()->isFileExist( file ) )
 	{
@@ -403,9 +398,6 @@ XmlDocPointer loadDoc( const std::string& datFile_, const std::string& file )
 #endif
 
 	std::string data = readFromFile( datFile, file );
-#else
-	std::string data;
-#endif
 	if( data.empty() || doc->load( data.c_str() ).status != pugi::status_ok )
 	{
 		doc->load_file( file.c_str() );

@@ -6,12 +6,12 @@ namespace facebook
 	static CallbackLogin onLogin;
 	static CallbackLogout onLogout;
 
-	void setCallback( CallbackLogin callback )
+	void setCallbackLogin( CallbackLogin callback )
 	{
 		onLogin = callback;
 	}
 
-	void setCallback( CallbackLogout callback )
+	void setCallbackLogout( CallbackLogout callback )
 	{
 		onLogout = callback;
 	}

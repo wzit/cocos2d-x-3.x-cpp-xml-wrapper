@@ -8,12 +8,14 @@ namespace facebook
 	typedef std::function<void( const std::string& firstname, const std::string& lastname, const std::string& id )> CallbackLogin;
 	typedef std::function<void()> CallbackLogout;
 
-	void setCallback( CallbackLogin callback );
-	void setCallback( CallbackLogout callback );
-	void login();
+	void setCallbackLogin( CallbackLogin callback );
+	void setCallbackLogout( CallbackLogout callback );
+	void login( bool friends );
 	void logout();
 	void share( const std::string& ulr, const std::string& imageUrl, const std::string& description );
+	void shareLink( const std::string& ulr, const std::string& title, const std::string& description );
 
+	bool isLogged();
 	std::string getFirstName();
 	std::string getLastName();
 	std::string getUserId();
