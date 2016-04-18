@@ -13,7 +13,8 @@
 #include "ml/ImageManager.h"
 #include "ml/Audio/AudioEngine.h"
 #include "ml/Text.h"
-#include "loadxml/xmlProperties.h"
+#include "ml/loadxml/xmlLoader.h"
+#include "ml/loadxml/xmlProperties.h"
 using namespace cocos2d;
 
 const std::string kNameText( "text" );
@@ -149,24 +150,25 @@ void mlMenuItem::setImageNormal( const std::string & imagefile )
 	if( _imageNormal == imagefile )
 		return;
 	_imageNormal = imagefile;
-	IntrusivePtr<Sprite> image = ImageManager::shared().sprite( _imageNormal );
-
-	Vector<Node*> children;
-	if( MenuItemImage::getNormalImage() )
-		children = MenuItemImage::getNormalImage()->getChildren();
-	for( auto child : children )
-		child->removeFromParentAndCleanup(false);
-	MenuItemImage::setNormalImage( image );
-	for( auto child : children )
-		image->addChild( child );
-	if( image )
+	IntrusivePtr<Sprite> image = static_cast<Sprite*>(getNormalImage());
+	if( !image )
+	{
+		image = ImageManager::shared().sprite( imagefile );
 		image->setName( kNameImageNormal );
+	}
+	else
+	{
+		xmlLoader::setProperty( image, xmlLoader::kImage, imagefile );
+		image->removeFromParentAndCleanup(false);
+		_normalImage = nullptr;
+	}
+
+	MenuItemImage::setNormalImage( image );
 	if( _labelNormal )
 	{
 		auto center = image->getContentSize() / 2;
 		_labelNormal->setPosition( center );
 	}
-
 	locateImages();
 }
 
@@ -175,15 +177,26 @@ void mlMenuItem::setImageSelected( const std::string & imagefile )
 	if( _imageSelected == imagefile )
 		return;
 	_imageSelected = imagefile;
-	IntrusivePtr<Sprite> image = ImageManager::shared().sprite( imagefile );
+	IntrusivePtr<Sprite> image = static_cast<Sprite*>(getSelectedImage());
+	if( !image )
+	{
+		image = ImageManager::shared().sprite( imagefile );
+		image->setName( kNameImageSelected );
+	}
+	else
+	{
+		xmlLoader::setProperty( image, xmlLoader::kImage, imagefile );
+		image->removeFromParent();
+		_selectedImage = nullptr;
+	}
+
 	MenuItemImage::setSelectedImage( image );
-	image->setName( kNameImageSelected );
-	locateImages();
 	if( _labelSelected )
 	{
 		auto center = image->getContentSize() / 2;
 		_labelSelected->setPosition( center );
 	}
+	locateImages();
 }
 
 void mlMenuItem::setImageDisabled( const std::string & imagefile )
@@ -191,9 +204,20 @@ void mlMenuItem::setImageDisabled( const std::string & imagefile )
 	if( _imageDisabled == imagefile )
 		return;
 	_imageDisabled = imagefile;
-	IntrusivePtr<Sprite> image = ImageManager::shared().sprite( imagefile );
+	IntrusivePtr<Sprite> image = static_cast<Sprite*>(getDisabledImage());
+	if( !image )
+	{
+		image = ImageManager::shared().sprite( imagefile );
+		image->setName( kNameImageDisabled );
+	}
+	else
+	{
+		xmlLoader::setProperty( image, xmlLoader::kImage, imagefile );
+		image->removeFromParent();
+		_disabledImage = nullptr;
+	}
+
 	MenuItemImage::setDisabledImage( image );
-	image->setName( kNameImageDisabled );
 	locateImages();
 	if( _labelDisabled )
 	{
