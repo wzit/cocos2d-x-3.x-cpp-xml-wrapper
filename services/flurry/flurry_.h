@@ -16,6 +16,7 @@
 
 namespace flurry
 {
+	void initialization( const std::string& appId );
 	void logEvent( const ParamCollection & params );
 }
 

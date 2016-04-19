@@ -28,22 +28,11 @@ namespace flurry
 	{
 		JavaBind bind("org.cocos2dx.cpp", "Flurry", "logEvent", "%s");
 		bind.call( params.string() );
-		/*
-		JniMethodInfo t;
-		if( JniHelper::getStaticMethodInfo( t, Activity, "logEvent", "(Ljava/lang/String;)V" ) )
-		{
-			jstring stringArg = t.env->NewStringUTF( params.string().c_str() );
-			t.env->CallStaticIntMethod( t.classID, t.methodID, stringArg );
-			t.env->DeleteLocalRef( stringArg );
-			t.env->DeleteLocalRef( t.classID );
-		}
-		else
-		{
-			log( "............................." );
-			log( "flurry::logEvent::jni flurryLogEvent notfound" );
-			log( "............................." );
-		}
-		*/
+	}
+	void initialization( const std::string& id)
+	{
+		JavaBind bind("org.cocos2dx.cpp", "Flurry", "initialization", "%s");
+		bind.call( id );
 	}
 }
 #endif

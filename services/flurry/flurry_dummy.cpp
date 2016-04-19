@@ -13,6 +13,13 @@
 
 namespace flurry
 {
+	bool initialized( false );
+	void initialization( const std::string& appId )
+	{
+		assert( !initialized );
+		initialized = true;
+	}
+
 	void logEvent( const ParamCollection & params )
 	{
 		assert( params.size() < 10 );
