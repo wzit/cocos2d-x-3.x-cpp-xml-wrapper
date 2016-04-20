@@ -20,6 +20,7 @@
 #include "ml/services/fyber/fyber_.h"
 #include "ml/services/mlStatistic.h"
 #include "ml/common.h"
+#include "ml/mlUserData.h"
 
 USING_NS_CC;
 
@@ -105,7 +106,9 @@ void ServicePlugin::hideBanner()
 
 void ServicePlugin::showInterstitialBanner()
 {
-	if( _servises.find( Type::interstitialBanner ) == _servises.end() )
+	bool disabled = mlUserData::getInstance()->get<bool>( "ServicePlugin_disableInterstitials" );
+
+	if( disabled || _servises.find( Type::interstitialBanner ) == _servises.end() )
 		return;
 	const auto& types = _servises.at( Type::interstitialBanner );
 	bool show(false);
@@ -216,6 +219,11 @@ void ServicePlugin::showRewardVideo()
 	}
 
 	mlStatistic::shared().accumulate( "ad_rewardervideo", pc, false );
+}
+
+void ServicePlugin::disableInterstitials()
+{
+	mlUserData::getInstance()->write( "ServicePlugin_disableInterstitials", true );
 }
 
 int ServicePlugin::getVideoRewardAmound()

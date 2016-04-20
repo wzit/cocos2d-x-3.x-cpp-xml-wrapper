@@ -60,6 +60,8 @@ public:
 	void showOffers();
 	void showRewardVideo();
 
+	void disableInterstitials();
+
 	int getVideoRewardAmound();
 	bool isVideoAvailabled();
 
