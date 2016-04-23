@@ -15,8 +15,25 @@
 
 namespace flurry
 {
+	void initialization( const std::string& appId )
+	{
+		//NSString* string = [NSString stringWithUTF8String: appId.c_str()];
+		//[Flurry startSession:string];
+	}
+	
 	void logEvent( const ParamCollection & params )
 	{
-		[AppController flurryEvent:params];
+		/*
+		NSMutableDictionary *dictionary = [[NSMutableDictionary alloc] init];
+		for( auto& pair : params )
+		{
+			NSString * obj = [NSString stringWithUTF8String:pair.second.c_str()];
+			NSString * key = [NSString stringWithUTF8String:pair.first.c_str()];
+			[dictionary setObject:obj forKey:key];
+		}
+		
+		NSString * event = [NSString stringWithUTF8String: params.at("event").c_str()];
+		[Flurry logEvent:event withParameters:dictionary];
+		 */
 	}
 }
