@@ -17,23 +17,51 @@
 //
 //
 
-#include "AppController.h"
+#import "AppController.h"
+#import <Chartboost/Chartboost.h>
 #include <string>
+#include "cocos2d.h"
+
+
+@interface ChartboostDelegateImpl : NSObject<ChartboostDelegate>
+@end
+
+@implementation ChartboostDelegateImpl
+- (void)didInitialize:(BOOL)status
+{
+	cocos2d::log( "didInitialize");
+}
+@end
 
 namespace chartboost
 {
 	void initialization( const std::string appID, const std::string& appSignature )
-	{ }
-	void activateTestMode(){}
-	bool isInitialized(){return true;}
+	{
+		static ChartboostDelegateImpl* impl = [[ChartboostDelegateImpl alloc] init];
+		
+		NSString* appId = [NSString stringWithUTF8String:appID.c_str()];
+		NSString* appKey = [NSString stringWithUTF8String:appSignature.c_str()];
+		// Initialize the Chartboost library
+		[Chartboost startWithAppId:appId
+					  appSignature:appKey
+						  delegate:impl];
+	}
+	
+	void activateTestMode()
+	{
+	}
+	bool isInitialized()
+	{
+		return true;
+	}
 	bool interstitialIsAvailabled()
 	{
-		return [AppController chartboostIsAvailabled];
+		return true;
 	}
 	
 	void showInterstitial()
 	{
-		[AppController chartboostShowInterstitial];
+		[Chartboost showInterstitial:CBLocationHomeScreen];
 	}
 	
 	void showMoreApps()
