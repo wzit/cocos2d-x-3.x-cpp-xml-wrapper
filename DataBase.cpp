@@ -1,6 +1,6 @@
-#include "ml/DataBase.h"
-#include "ml/mlUserData.h"
-#include "ml/loadxml/xmlLoader.h"
+#include "DataBase.h"
+#include "mlUserData.h"
+#include "loadxml/xmlLoader.h"
 NS_CC_BEGIN
 
 size_t DataBase::max( const std::string& group, const std::string& param )const

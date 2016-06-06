@@ -3,14 +3,14 @@
  * Copyright 2014-2015 Vladimir Tolmachev
  *
  * Author: Vladimir Tolmachev
- * Project: Defense of Greece
+ * Project: ml
  * e-mail: tolm_vl@hotmail.com
  * If you received the code is not the author, please contact me
  */
 /******************************************************************************/
 
-#include "ml/Audio/AudioEngine.h"
-#include "ml/loadxml/xmlLoader.h"
+#include "Audio/AudioEngine.h"
+#include "loadxml/xmlLoader.h"
 NS_CC_BEGIN;
 using namespace CocosDenshion;
 

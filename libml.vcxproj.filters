@@ -1,0 +1,257 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Audio">
+      <UniqueIdentifier>{86d091e7-0729-4f17-ba9c-4494bad98dbf}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="dev">
+      <UniqueIdentifier>{e68997da-914f-4152-987f-9a900552297a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="loadxml">
+      <UniqueIdentifier>{ff1a5c96-7dc3-4363-b168-d3afe7efe3e2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="pugixml">
+      <UniqueIdentifier>{01440ac7-17c7-4ac2-976b-2f48a46fa134}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="servises">
+      <UniqueIdentifier>{6800bb52-9654-4e3f-adf1-cdedc6f2883d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="servises\admob">
+      <UniqueIdentifier>{6853af2c-8bd1-494b-a7cc-29f6587620e0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="servises\chartboost">
+      <UniqueIdentifier>{6fc20f48-c750-4571-a536-8e79161c7b18}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="servises\adcolony">
+      <UniqueIdentifier>{7566d341-843f-4d27-b978-7d5af49ab3c5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="servises\inapp">
+      <UniqueIdentifier>{57fb0966-41c5-4fb3-9252-b50dba0df671}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="servises\flurry">
+      <UniqueIdentifier>{e398c1ab-1668-4aa7-8f34-c2276da9a3ec}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="servises\batch">
+      <UniqueIdentifier>{600967af-24d4-424a-83ab-853df86396af}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="servises\plugins">
+      <UniqueIdentifier>{05471b8e-cb53-4887-ba24-0bb5a8ba0dcf}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="servises\tapjoy">
+      <UniqueIdentifier>{0ca6d9aa-9c31-49e4-b3e7-ed5c17dcb31b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="servises\unity">
+      <UniqueIdentifier>{75cafb83-5d5b-4cbb-a2f9-fbeebb9fbf87}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="servises\appodeal">
+      <UniqueIdentifier>{47fd8d3e-b986-4ba4-9720-f748240f9862}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="servises\fyber">
+      <UniqueIdentifier>{c810aa70-8aed-4188-bafc-86c8231d6e00}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="servises\facebook">
+      <UniqueIdentifier>{63b264b2-1f6d-4304-87a9-d7100b411043}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="xtea">
+      <UniqueIdentifier>{e82035ec-be21-489e-b4ff-a2d1fce1f5d4}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="Audio\AudioEngine.cpp">
+      <Filter>Audio</Filter>
+    </ClCompile>
+    <ClCompile Include="Audio\AudioMenu.cpp">
+      <Filter>Audio</Filter>
+    </ClCompile>
+    <ClCompile Include="loadxml\Crypto.cpp">
+      <Filter>loadxml</Filter>
+    </ClCompile>
+    <ClCompile Include="loadxml\xmlLoader.cpp">
+      <Filter>loadxml</Filter>
+    </ClCompile>
+    <ClCompile Include="loadxml\xmlProperties.cpp">
+      <Filter>loadxml</Filter>
+    </ClCompile>
+    <ClCompile Include="pugixml\pugixml.cpp">
+      <Filter>pugixml</Filter>
+    </ClCompile>
+    <ClCompile Include="dev\HierarchyTree.cpp">
+      <Filter>dev</Filter>
+    </ClCompile>
+    <ClCompile Include="services\playservises\playservises_dummy.cpp">
+      <Filter>servises</Filter>
+    </ClCompile>
+    <ClCompile Include="services\Advertisers.cpp">
+      <Filter>servises</Filter>
+    </ClCompile>
+    <ClCompile Include="xtea\xtea.cpp">
+      <Filter>xtea</Filter>
+    </ClCompile>
+    <ClCompile Include="services\mlStatistic.cpp">
+      <Filter>servises</Filter>
+    </ClCompile>
+    <ClCompile Include="services\admob\AdMob.cpp">
+      <Filter>servises\admob</Filter>
+    </ClCompile>
+    <ClCompile Include="services\chartboost\chartboost_dummy.cpp">
+      <Filter>servises\chartboost</Filter>
+    </ClCompile>
+    <ClCompile Include="services\adcolony\adcolony_dummy.cpp">
+      <Filter>servises\adcolony</Filter>
+    </ClCompile>
+    <ClCompile Include="services\inapp\Purchase.cpp">
+      <Filter>servises\inapp</Filter>
+    </ClCompile>
+    <ClCompile Include="services\inapp\Purchase_win32.cpp">
+      <Filter>servises\inapp</Filter>
+    </ClCompile>
+    <ClCompile Include="services\flurry\flurry_dummy.cpp">
+      <Filter>servises\flurry</Filter>
+    </ClCompile>
+    <ClCompile Include="services\appgratis\appgratis_dummy.cpp">
+      <Filter>servises\batch</Filter>
+    </ClCompile>
+    <ClCompile Include="services\plugins\ServicePlugin.cpp">
+      <Filter>servises\plugins</Filter>
+    </ClCompile>
+    <ClCompile Include="services\tapjoy\tapjoy_dummy.cpp">
+      <Filter>servises\tapjoy</Filter>
+    </ClCompile>
+    <ClCompile Include="services\unityads\unityads_dummy.cpp">
+      <Filter>servises\unity</Filter>
+    </ClCompile>
+    <ClCompile Include="services\appodeal\appodeal_dummy.cpp">
+      <Filter>servises\appodeal</Filter>
+    </ClCompile>
+    <ClCompile Include="services\fyber\fyber_dummy.cpp">
+      <Filter>servises\fyber</Filter>
+    </ClCompile>
+    <ClCompile Include="services\facebook\facebook_dummy.cpp">
+      <Filter>servises\facebook</Filter>
+    </ClCompile>
+    <ClCompile Include="services\facebook\facebook.cpp">
+      <Filter>servises\facebook</Filter>
+    </ClCompile>
+    <ClCompile Include="services\facebook\facebook_android.cpp">
+      <Filter>servises\facebook</Filter>
+    </ClCompile>
+    <ClCompile Include="Animation.cpp" />
+    <ClCompile Include="AStar.cpp" />
+    <ClCompile Include="common.cpp" />
+    <ClCompile Include="DataBase.cpp" />
+    <ClCompile Include="Events.cpp" />
+    <ClCompile Include="FiniteStateMachine.cpp" />
+    <ClCompile Include="ImageManager.cpp" />
+    <ClCompile Include="IntrusivePtr.cpp" />
+    <ClCompile Include="Language.cpp" />
+    <ClCompile Include="MenuItem.cpp" />
+    <ClCompile Include="mlUserData.cpp" />
+    <ClCompile Include="NodeExt.cpp" />
+    <ClCompile Include="ObjectFactory.cpp" />
+    <ClCompile Include="Panel.cpp" />
+    <ClCompile Include="ParamCollection.cpp" />
+    <ClCompile Include="ScrollMenu.cpp" />
+    <ClCompile Include="SmartScene.cpp" />
+    <ClCompile Include="SplashScene.cpp" />
+    <ClCompile Include="Text.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Audio\AudioEngine.h">
+      <Filter>Audio</Filter>
+    </ClInclude>
+    <ClInclude Include="Audio\AudioMenu.h">
+      <Filter>Audio</Filter>
+    </ClInclude>
+    <ClInclude Include="loadxml\Crypto.h">
+      <Filter>loadxml</Filter>
+    </ClInclude>
+    <ClInclude Include="loadxml\xmlLoader.h">
+      <Filter>loadxml</Filter>
+    </ClInclude>
+    <ClInclude Include="loadxml\xmlProperties.h">
+      <Filter>loadxml</Filter>
+    </ClInclude>
+    <ClInclude Include="pugixml\pugixml.hpp">
+      <Filter>pugixml</Filter>
+    </ClInclude>
+    <ClInclude Include="pugixml\pugiconfig.hpp">
+      <Filter>pugixml</Filter>
+    </ClInclude>
+    <ClInclude Include="dev\HierarchyTree.h">
+      <Filter>dev</Filter>
+    </ClInclude>
+    <ClInclude Include="services\playservises\playservises.h">
+      <Filter>servises</Filter>
+    </ClInclude>
+    <ClInclude Include="services\Advertisers.h">
+      <Filter>servises</Filter>
+    </ClInclude>
+    <ClInclude Include="xtea\xtea.h">
+      <Filter>xtea</Filter>
+    </ClInclude>
+    <ClInclude Include="services\mlStatistic.h">
+      <Filter>servises</Filter>
+    </ClInclude>
+    <ClInclude Include="services\admob\AdMob.h">
+      <Filter>servises\admob</Filter>
+    </ClInclude>
+    <ClInclude Include="services\chartboost\chartboost.h">
+      <Filter>servises\chartboost</Filter>
+    </ClInclude>
+    <ClInclude Include="services\adcolony\adcolony.h">
+      <Filter>servises\adcolony</Filter>
+    </ClInclude>
+    <ClInclude Include="services\inapp\Purchase.h">
+      <Filter>servises\inapp</Filter>
+    </ClInclude>
+    <ClInclude Include="services\appgratis\appgratis.h">
+      <Filter>servises\batch</Filter>
+    </ClInclude>
+    <ClInclude Include="services\plugins\ServicePlugin.h">
+      <Filter>servises\plugins</Filter>
+    </ClInclude>
+    <ClInclude Include="services\tapjoy\tapjoy.h">
+      <Filter>servises\tapjoy</Filter>
+    </ClInclude>
+    <ClInclude Include="services\unityads\unityads.h">
+      <Filter>servises\unity</Filter>
+    </ClInclude>
+    <ClInclude Include="services\appodeal\appodeal_.h">
+      <Filter>servises\appodeal</Filter>
+    </ClInclude>
+    <ClInclude Include="services\fyber\fyber_.h">
+      <Filter>servises\fyber</Filter>
+    </ClInclude>
+    <ClInclude Include="services\facebook\facebook.h">
+      <Filter>servises\facebook</Filter>
+    </ClInclude>
+    <ClInclude Include="Animation.h" />
+    <ClInclude Include="AStar.h" />
+    <ClInclude Include="common.h" />
+    <ClInclude Include="DataBase.h" />
+    <ClInclude Include="Events.h" />
+    <ClInclude Include="FiniteStateMachine.h" />
+    <ClInclude Include="ImageManager.h" />
+    <ClInclude Include="IntrusivePtr.h" />
+    <ClInclude Include="Language.h" />
+    <ClInclude Include="macroses.h" />
+    <ClInclude Include="MenuItem.h" />
+    <ClInclude Include="mlUserData.h" />
+    <ClInclude Include="NodeExt.h" />
+    <ClInclude Include="ObjectFactory.h" />
+    <ClInclude Include="Observer.h" />
+    <ClInclude Include="Panel.h" />
+    <ClInclude Include="ParamCollection.h" />
+    <ClInclude Include="Scissor.h" />
+    <ClInclude Include="ScrollMenu.h" />
+    <ClInclude Include="Singlton.h" />
+    <ClInclude Include="SmartScene.h" />
+    <ClInclude Include="SplashScene.h" />
+    <ClInclude Include="std_extension.h" />
+    <ClInclude Include="Text.h" />
+    <ClInclude Include="types.h" />
+    <ClInclude Include="services\flurry\flurry_.h">
+      <Filter>servises\flurry</Filter>
+    </ClInclude>
+  </ItemGroup>
+</Project>

@@ -3,7 +3,7 @@
  * Copyright 2014-2015 Vladimir Tolmachev
  *
  * Author: Vladimir Tolmachev
- * Project: Defense of Greece
+ * Project: ml
  * e-mail: tolm_vl@hotmail.com
  * If you received the code is not the author, please contact me
  */
@@ -14,7 +14,7 @@
 #include "cocos2d.h"
 #include <stdarg.h>
 #include "ImageManager.h"
-#include "ml/common.h"
+#include "common.h"
 using namespace cocos2d;
 
 cocos2d::Animation* createAnimation(const std::string & path, int firstIndex, int lastIndex, const std::string & fileExt, float duration)

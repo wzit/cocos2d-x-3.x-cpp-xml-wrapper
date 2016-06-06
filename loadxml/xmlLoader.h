@@ -3,7 +3,7 @@
  * Copyright 2014-2015 Vladimir Tolmachev
  *
  * Author: Vladimir Tolmachev
- * Project: Defense of Greece
+ * Project: ml
  * e-mail: tolm_vl@hotmail.com
  * If you received the code is not the author, please contact me
  */
@@ -11,8 +11,8 @@
 
 #ifndef __xmlLoader_h__
 #define __xmlLoader_h__
-#include "ml/macroses.h"
-#include "ml/pugixml/pugixml.hpp"
+#include "macroses.h"
+#include "pugixml/pugixml.hpp"
 #include "Crypto.h"
 
 class ParamCollection;

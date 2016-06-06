@@ -3,17 +3,17 @@
  * Copyright 2014-2015 Vladimir Tolmachev
  *
  * Author: Vladimir Tolmachev
- * Project: Defense of Greece
+ * Project: ml
  * e-mail: tolm_vl@hotmail.com
  * If you received the code is not the author, please contact me
  */
 /******************************************************************************/
 
 #include "NodeExt.h"
-#include "ml/common.h"
-#include "ml/loadxml/xmlProperties.h"
-#include "ml/loadxml/Crypto.h"
-#include "ml/SmartScene.h"
+#include "common.h"
+#include "loadxml/xmlProperties.h"
+#include "loadxml/Crypto.h"
+#include "SmartScene.h"
 NS_CC_BEGIN
 
 NodeExt::NodeExt()

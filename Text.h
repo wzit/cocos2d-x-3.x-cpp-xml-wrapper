@@ -3,7 +3,7 @@
  * Copyright 2014-2015 Vladimir Tolmachev
  *
  * Author: Vladimir Tolmachev
- * Project: Defense of Greece
+ * Project: ml
  * e-mail: tolm_vl@hotmail.com
  * If you received the code is not the author, please contact me
  */
@@ -12,10 +12,10 @@
 #ifndef __Text_h__
 #define __Text_h__
 #include "cocos2d.h"
-#include "ml/macroses.h"
-#include "ml/NodeExt.h"
-#include "ml/loadxml/xmlProperties.h"
-#include "ml/common.h"
+#include "macroses.h"
+#include "NodeExt.h"
+#include "loadxml/xmlProperties.h"
+#include "common.h"
 NS_CC_BEGIN
 
 //Label::createWithBMFont

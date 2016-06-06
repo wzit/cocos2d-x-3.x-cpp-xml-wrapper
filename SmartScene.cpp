@@ -3,14 +3,14 @@
  * Copyright 2014-2015 Vladimir Tolmachev
  *
  * Author: Vladimir Tolmachev
- * Project: Defense of Greece
+ * Project: ml
  * e-mail: tolm_vl@hotmail.com
  * If you received the code is not the author, please contact me
  */
 /******************************************************************************/
 
-#include "ml/SmartScene.h"
-#include "ml/ImageManager.h"
+#include "SmartScene.h"
+#include "ImageManager.h"
 NS_CC_BEGIN
 
 const std::string kImageShadow( "images/square.png" );

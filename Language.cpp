@@ -3,23 +3,35 @@
  * Copyright 2014-2015 Vladimir Tolmachev
  *
  * Author: Vladimir Tolmachev
- * Project: Defense of Greece
+ * Project: ml
  * e-mail: tolm_vl@hotmail.com
  * If you received the code is not the author, please contact me
  */
 /******************************************************************************/
 
 #include "cocos2d.h"
-#include "ml/Language.h"
-#include "ml/Observer.h"
-#include "ml/loadxml/xmlLoader.h"
-#include "ml/mlUserData.h"
+#include "Language.h"
+#include "Observer.h"
+#include "loadxml/xmlLoader.h"
+#include "mlUserData.h"
 
 NS_CC_BEGIN;
 
-Language::Language()
-: _currentID(-1)
+static bool Language_isLIfe( false );
+bool Language::isLife()
 {
+	return Language_isLIfe;
+}
+
+Language::Language()
+	: _currentID( -1 )
+{
+	Language_isLIfe = true;
+};
+
+Language::~Language()
+{
+	Language_isLIfe = false;
 };
 
 void Language::onCreate()

@@ -3,18 +3,18 @@
  * Copyright 2014-2015 Vladimir Tolmachev
  *
  * Author: Vladimir Tolmachev
- * Project: Defense of Greece
+ * Project: ml
  * e-mail: tolm_vl@hotmail.com
  * If you received the code is not the author, please contact me
  */
 /******************************************************************************/
 
-#include "ml/common.h"
-#include "ml/ObjectFactory.h"
-#include "ml/Events.h"
-#include "ml/ScrollMenu.h"
-#include "ml/Animation.h"
-#include "ml/ParamCollection.h"
+#include "common.h"
+#include "ObjectFactory.h"
+#include "Events.h"
+#include "ScrollMenu.h"
+#include "Animation.h"
+#include "ParamCollection.h"
 #include "xmlLoader.h"
 #include "xmlProperties.h"
 #include "Crypto.h"

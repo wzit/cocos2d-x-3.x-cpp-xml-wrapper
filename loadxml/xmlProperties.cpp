@@ -3,22 +3,22 @@
  * Copyright 2014-2015 Vladimir Tolmachev
  *
  * Author: Vladimir Tolmachev
- * Project: Defense of Greece
+ * Project: ml
  * e-mail: tolm_vl@hotmail.com
  * If you received the code is not the author, please contact me
  */
 /******************************************************************************/
 
-#include "ml/types.h"
-#include "ml/common.h"
-#include "ml/ScrollMenu.h"
-#include "ml/MenuItem.h"
-#include "ml/ImageManager.h"
-#include "ml/NodeExt.h"
-#include "ml/Language.h"
-#include "ml/Panel.h"
-#include "ml/Text.h"
-#include "ml/mlUserData.h"
+#include "types.h"
+#include "common.h"
+#include "ScrollMenu.h"
+#include "MenuItem.h"
+#include "ImageManager.h"
+#include "NodeExt.h"
+#include "Language.h"
+#include "Panel.h"
+#include "Text.h"
+#include "mlUserData.h"
 #include "xmlProperties.h"
 
 NS_CC_BEGIN;

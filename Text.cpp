@@ -3,16 +3,16 @@
  * Copyright 2014-2015 Vladimir Tolmachev
  *
  * Author: Vladimir Tolmachev
- * Project: Defense of Greece
+ * Project: ml
  * e-mail: tolm_vl@hotmail.com
  * If you received the code is not the author, please contact me
  */
 /******************************************************************************/
 
 #include "Text.h"
-#include "ml/loadxml/xmlLoader.h"
-#include "ml/loadxml/xmlProperties.h"
-#include "ml/Language.h"
+#include "loadxml/xmlLoader.h"
+#include "loadxml/xmlProperties.h"
+#include "Language.h"
 NS_CC_BEGIN
 
 Text::Text()
@@ -23,7 +23,8 @@ Text::Text()
 
 Text::~Text( )
 {
-	Language::shared().observer.remove( _ID );
+	if( Language::isLife() )
+		Language::shared().observer.remove( _ID );
 }
 
 bool Text::init()

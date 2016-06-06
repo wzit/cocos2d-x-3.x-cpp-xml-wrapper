@@ -3,15 +3,15 @@
  * Copyright 2014-2015 Vladimir Tolmachev
  *
  * Author: Vladimir Tolmachev
- * Project: Defense of Greece
+ * Project: ml
  * e-mail: tolm_vl@hotmail.com
  * If you received the code is not the author, please contact me
  */
 /******************************************************************************/
 
 #include "Panel.h"
-#include "ml/ImageManager.h"
-#include "ml/common.h"
+#include "ImageManager.h"
+#include "common.h"
 NS_CC_BEGIN
 
 Panel::Panel()

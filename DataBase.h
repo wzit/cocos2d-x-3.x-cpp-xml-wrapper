@@ -1,8 +1,8 @@
 #ifndef __DataBase_h__
 #define __DataBase_h__
 #include "cocos2d.h"
-#include "ml/macroses.h"
-#include "ml/Singlton.h"
+#include "macroses.h"
+#include "Singlton.h"
 NS_CC_BEGIN
 
 

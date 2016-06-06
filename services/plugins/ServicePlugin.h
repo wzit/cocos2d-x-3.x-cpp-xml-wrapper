@@ -3,7 +3,7 @@
  * Copyright 2014-2015 Vladimir Tolmachev
  *
  * Author: Vladimir Tolmachev
- * Project: Defense of Greece
+ * Project: ml
  * e-mail: tolm_vl@hotmail.com
  * If you received the code is not the author, please contact me
  */
@@ -13,10 +13,10 @@
 #define __ServicePlugin_h__
 
 #include <map>
-#include "ml/Singlton.h"
-#include "ml/ParamCollection.h"
-#include "ml/services/adcolony/adcolony.h"
-#include "ml/Observer.h"
+#include "Singlton.h"
+#include "ParamCollection.h"
+#include "services/adcolony/adcolony.h"
+#include "Observer.h"
 
 class ServicePlugin : public Singlton<ServicePlugin>
 {

@@ -15,7 +15,7 @@
 #include <iostream>
 #include <assert.h>
 #include "cocos2d.h"
-#include "ml/Timer.h"
+#include "Timer.h"
 
 NS_CC_BEGIN;
 

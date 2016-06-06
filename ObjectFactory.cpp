@@ -3,19 +3,19 @@
  * Copyright 2014-2015 Vladimir Tolmachev
  *
  * Author: Vladimir Tolmachev
- * Project: Defense of Greece
+ * Project: ml
  * e-mail: tolm_vl@hotmail.com
  * If you received the code is not the author, please contact me
  */
 /******************************************************************************/
 
-#include "ml/ObjectFactory.h"
-#include "ml/Events.h"
-#include "ml/ScrollMenu.h"
-#include "ml/MenuItem.h"
-#include "ml/NodeExt.h"
-#include "ml/Panel.h"
-#include "ml/Text.h"
+#include "ObjectFactory.h"
+#include "Events.h"
+#include "ScrollMenu.h"
+#include "MenuItem.h"
+#include "NodeExt.h"
+#include "Panel.h"
+#include "Text.h"
 NS_CC_BEGIN;
 
 Factory::Factory()

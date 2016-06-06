@@ -3,7 +3,7 @@
  * Copyright 2014-2015 Vladimir Tolmachev
  *
  * Author: Vladimir Tolmachev
- * Project: Defense of Greece
+ * Project: ml
  * e-mail: tolm_vl@hotmail.com
  * If you received the code is not the author, please contact me
  */
@@ -15,7 +15,7 @@
 #include "Observer.h"
 #include "Singlton.h"
 #include "cocos2d.h"
-#include "ml/pugixml/pugixml.hpp"
+#include "pugixml/pugixml.hpp"
 #include <string>
 #include <memory>
 #include <map>
@@ -33,7 +33,9 @@ class Language : public Singlton<Language>
 public:
 	Observer<Language, std::function<void()> > observer;
 public:
+	static bool isLife();
 	Language();
+	~Language();
 	virtual void onCreate()override;
 	std::string string( const std::string & id, int depth = 10 );
 	void set( const std::string & language );

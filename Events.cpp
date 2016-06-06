@@ -3,21 +3,21 @@
  * Copyright 2014-2015 Vladimir Tolmachev
  *
  * Author: Vladimir Tolmachev
- * Project: Defense of Greece
+ * Project: ml
  * e-mail: tolm_vl@hotmail.com
  * If you received the code is not the author, please contact me
  */
 /******************************************************************************/
 
-#include "ml/Events.h"
-#include "ml/ObjectFactory.h"
-#include "ml/common.h"
-#include "ml/common.h"
-#include "ml/NodeExt.h"
-#include "ml/loadxml/xmlProperties.h"
-#include "ml/loadxml/xmlLoader.h"
-#include "ml/Audio/AudioEngine.h"
-#include "ml/services/mlStatistic.h"
+#include "Events.h"
+#include "ObjectFactory.h"
+#include "common.h"
+#include "common.h"
+#include "NodeExt.h"
+#include "loadxml/xmlProperties.h"
+#include "loadxml/xmlLoader.h"
+#include "Audio/AudioEngine.h"
+#include "services/mlStatistic.h"
 
 NS_CC_BEGIN;
 

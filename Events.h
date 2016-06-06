@@ -3,7 +3,7 @@
  * Copyright 2014-2015 Vladimir Tolmachev
  *
  * Author: Vladimir Tolmachev
- * Project: Defense of Greece
+ * Project: ml
  * e-mail: tolm_vl@hotmail.com
  * If you received the code is not the author, please contact me
  */
@@ -11,10 +11,10 @@
 
 #ifndef __Events_h__
 #define __Events_h__
-#include "ml/macroses.h"
-#include "ml/pugixml/pugixml.hpp"
-#include "ml/IntrusivePtr.h"
-#include "ml/ParamCollection.h"
+#include "macroses.h"
+#include "pugixml/pugixml.hpp"
+#include "IntrusivePtr.h"
+#include "ParamCollection.h"
 NS_CC_BEGIN;
 
 class NodeExt;

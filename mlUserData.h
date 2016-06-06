@@ -3,7 +3,7 @@
  * Copyright 2014-2015 Vladimir Tolmachev
  *
  * Author: Vladimir Tolmachev
- * Project: Defense of Greece
+ * Project: ml
  * e-mail: tolm_vl@hotmail.com
  * If you received the code is not the author, please contact me
  */
@@ -13,12 +13,12 @@
 #define __ml_USER_DATA__
 
 #include "cocos2d.h"
-#include "ml/pugixml/pugixml.hpp"
-#include "ml/loadxml/Crypto.h"
-#include "ml/Singlton.h"
-#include "ml/Observer.h"
-#include "ml/common.h"
-#include "ml/types.h"
+#include "pugixml/pugixml.hpp"
+#include "loadxml/Crypto.h"
+#include "Singlton.h"
+#include "Observer.h"
+#include "common.h"
+#include "types.h"
 NS_CC_BEGIN;
 
 class UserData;

@@ -3,7 +3,7 @@
  * Copyright 2014-2015 Vladimir Tolmachev
  *
  * Author: Vladimir Tolmachev
- * Project: Defense of Greece
+ * Project: ml
  * e-mail: tolm_vl@hotmail.com
  * If you received the code is not the author, please contact me
  */
@@ -11,16 +11,16 @@
 
 #include <assert.h>
 #include "ServicePlugin.h"
-#include "ml/services/admob/AdMob.h"
-#include "ml/services/flurry/flurry_.h"
-#include "ml/services/tapjoy/tapjoy.h"
-#include "ml/services/chartboost/chartboost.h"
-#include "ml/services/unityads/unityads.h"
-#include "ml/services/appodeal/appodeal_.h"
-#include "ml/services/fyber/fyber_.h"
-#include "ml/services/mlStatistic.h"
-#include "ml/common.h"
-#include "ml/mlUserData.h"
+#include "services/admob/AdMob.h"
+#include "services/flurry/flurry_.h"
+#include "services/tapjoy/tapjoy.h"
+#include "services/chartboost/chartboost.h"
+#include "services/unityads/unityads.h"
+#include "services/appodeal/appodeal_.h"
+#include "services/fyber/fyber_.h"
+#include "services/mlStatistic.h"
+#include "common.h"
+#include "mlUserData.h"
 
 USING_NS_CC;
 

@@ -3,7 +3,7 @@
  * Copyright 2014-2015 Vladimir Tolmachev
  *
  * Author: Vladimir Tolmachev
- * Project: Defense of Greece
+ * Project: ml
  * e-mail: tolm_vl@hotmail.com
  * If you received the code is not the author, please contact me
  */
@@ -12,8 +12,8 @@
 #ifndef __TowerDefence__AudioEngine__
 #define __TowerDefence__AudioEngine__
 #include "SimpleAudioEngine.h"
-#include "ml/Singlton.h"
-#include "ml/Observer.h"
+#include "Singlton.h"
+#include "Observer.h"
 #include <string>
 NS_CC_BEGIN;
 
