@@ -16,6 +16,8 @@
 #include "ParamCollection.h"
 #include "common.h"
 
+NS_CC_BEGIN;
+
 namespace appgratis
 {
 	struct Offer
@@ -71,5 +73,7 @@ namespace appgratis
 	void onRedeemResource( const std::string& name, const std::string& res, int count );
 	void setCallback( Callback callback );
 }
+
+NS_CC_END;
 
 #endif

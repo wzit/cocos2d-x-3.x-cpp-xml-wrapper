@@ -26,8 +26,6 @@ namespace xmlLoader
 	__DECLARE_INT_PROPERTY( Pos, "pos" );
 	__DECLARE_INT_PROPERTY( PosX, "x" );
 	__DECLARE_INT_PROPERTY( PosY, "y" );
-	__DECLARE_INT_PROPERTY( PosInterval, "posinterval" );
-	__DECLARE_INT_PROPERTY( PosRadius, "posradius" );
 	__DECLARE_INT_PROPERTY( Scale, "scale" );
 	__DECLARE_INT_PROPERTY( Rotation, "rotation" );
 	__DECLARE_INT_PROPERTY( Strech, "strech" );
@@ -42,22 +40,27 @@ namespace xmlLoader
 	__DECLARE_INT_PROPERTY( Name, "name" );
 	__DECLARE_INT_PROPERTY( Image, "image" );
 	__DECLARE_INT_PROPERTY( Blending, "blending" );
-	__DECLARE_INT_PROPERTY( Alias, "alias" );
 	__DECLARE_INT_PROPERTY( Opacity, "opacity" );
 	__DECLARE_INT_PROPERTY( Color, "color" );
 	__DECLARE_INT_PROPERTY( Animation, "animation" );
-	__DECLARE_INT_PROPERTY( Action, "action" );
 	__DECLARE_INT_PROPERTY( ImageNormal, "imageN" );
 	__DECLARE_INT_PROPERTY( ImageSelected, "imageS" );
 	__DECLARE_INT_PROPERTY( ImageDisabled, "imageD" );
-	__DECLARE_INT_PROPERTY( Enabled, "enabled" );
 	__DECLARE_INT_PROPERTY( Text, "text" );
 	__DECLARE_INT_PROPERTY( Font, "font" );
+	__DECLARE_INT_PROPERTY( FontSystem, "fontsystem" );
 	__DECLARE_INT_PROPERTY( FontTTF, "fontttf" );
 	__DECLARE_INT_PROPERTY( FontSize, "fontsize" );
 	__DECLARE_INT_PROPERTY( TextWidth, "textwidth" );
 	__DECLARE_INT_PROPERTY( TextAlign, "textalign" );
+	__DECLARE_INT_PROPERTY( EnableShadow, "enableshadow" );
+	__DECLARE_INT_PROPERTY( DisableShadow, "disableshadow" );
+	__DECLARE_INT_PROPERTY( EnableOutline, "enableoutline" );
+	__DECLARE_INT_PROPERTY( DisableOutline, "disableoutline" );
+	__DECLARE_INT_PROPERTY( EnableGlow, "enableglow" );
+	__DECLARE_INT_PROPERTY( DisableGlow, "disableglow" );
 	__DECLARE_INT_PROPERTY( MenuCallBack, "callback" );
+	__DECLARE_INT_PROPERTY( Enabled, "enabled" );
 	__DECLARE_INT_PROPERTY( ScaleEffect, "scale_effect" );
 	__DECLARE_INT_PROPERTY( Sound, "sound" );
 	__DECLARE_INT_PROPERTY( Path, "path" );
@@ -70,21 +73,23 @@ namespace xmlLoader
 	__DECLARE_INT_PROPERTY( ScrollEnabled, "scrollenabled" );
 	__DECLARE_INT_PROPERTY( AllowScrollByX, "allowscrollbyx" );
 	__DECLARE_INT_PROPERTY( AllowScrollByY, "allowscrollbyy" );
-	__DECLARE_INT_PROPERTY( DelayOnActivate, "delayonactivate" );
-	__DECLARE_INT_PROPERTY( Folder, "folder" );
-	__DECLARE_INT_PROPERTY( Duration, "duration" );
-	__DECLARE_INT_PROPERTY( HotLocalisation, "hotlocalisation" );
-	__DECLARE_INT_PROPERTY( MidPoint, "midpoint" );
-	__DECLARE_INT_PROPERTY( Percent, "percent" );
-	__DECLARE_INT_PROPERTY( BarRate, "barrate" );
+	__DECLARE_INT_PROPERTY( MouseScrollEnabled, "mousescrollenabled" );
+	__DECLARE_INT_PROPERTY( MouseScrollSpeed, "mousescrollspeed" );
+	//ProgressTimer
 	__DECLARE_INT_PROPERTY( ProgressType, "progresstype" );
-	__DECLARE_INT_PROPERTY( Resource, "resource" );
+	__DECLARE_INT_PROPERTY( Percent, "percent" );
+	__DECLARE_INT_PROPERTY( MidPoint, "midpoint" );
+	__DECLARE_INT_PROPERTY( BarChangeRate, "barchangerate" );
+	__DECLARE_INT_PROPERTY( UseBlur, "useblur" );
+	//mlSlider
+	__DECLARE_INT_PROPERTY( ProgressImage, "progressimage" );
+	__DECLARE_INT_PROPERTY( ShaderProgram, "shaderprogram" );
 
 	//declare other properties as UserProperties + int constant
 	__DECLARE_INT_PROPERTY( UserProperties, "" );
 
 	void bookDirectory( NodeExt* node );
-	void unbookDirectory();
+	void unbookDirectory( NodeExt* node );
 
 	int strToPropertyType( const std::string &property );
 	void setProperty( Node* node, const std::string &property, const std::string &value );

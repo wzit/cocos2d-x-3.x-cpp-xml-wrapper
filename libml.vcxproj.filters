@@ -154,6 +154,9 @@
     <ClCompile Include="SmartScene.cpp" />
     <ClCompile Include="SplashScene.cpp" />
     <ClCompile Include="Text.cpp" />
+    <ClCompile Include="ShadersCache.cpp" />
+    <ClCompile Include="LayerBlur.cpp" />
+    <ClCompile Include="Generics.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Audio\AudioEngine.h">
@@ -253,5 +256,8 @@
     <ClInclude Include="services\flurry\flurry_.h">
       <Filter>servises\flurry</Filter>
     </ClInclude>
+    <ClInclude Include="ShadersCache.h" />
+    <ClInclude Include="LayerBlur.h" />
+    <ClInclude Include="Generics.h" />
   </ItemGroup>
 </Project>

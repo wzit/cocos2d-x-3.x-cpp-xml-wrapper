@@ -12,6 +12,8 @@
 #include "appgratis.h"
 #include <chrono>
 
+NS_CC_BEGIN;
+
 namespace appgratis
 {
 	void setCallback( Callback callback )
@@ -36,3 +38,5 @@ namespace appgratis
 		}
 	}
 }
+
+NS_CC_END;

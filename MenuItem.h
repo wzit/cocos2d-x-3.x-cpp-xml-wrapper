@@ -77,8 +77,8 @@ public:
 	void setImageDisabled( const std::string & imagefile );
 	void setText( const std::string & string );
 	void setFont( const std::string & fontfile );
-	void setSystemFontName( const std::string & fontname );
-	void setSystemFontSize( int fontsize );
+	void setTtfFontName( const std::string & fontname );
+	void setFontSize( int fontsize );
 
 	void setSound( const std::string sound );
 	void useScaleEffect( bool mode ) { _useScaleEffectOnSelected = mode; }

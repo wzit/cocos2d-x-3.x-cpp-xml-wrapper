@@ -13,6 +13,7 @@
 #define __Common_h__
 #include "cocos2d.h"
 #include "stdio.h"
+#include "Generics.h"
 
 #define FOR_EACHXML(_node, _child) for( auto _child = _node.first_child(); _child; _child = _child.next_sibling() )
 #define FOR_EACHXML_BYTAG(_node, _child, _tag) for( auto _child = _node.child(_tag); _child; _child = _child.next_sibling(_tag) ) 
@@ -75,43 +76,33 @@ std::string unite( const STLcont & cont, const char delimiter = ',' )
 void split( std::list<std::string> & out, const std::string & values, const char delimiter = ',' );
 void split( std::vector<std::string> & out, const std::string & values, const char delimiter = ',' );
 
-template <class T>
-std::string toStr( const T& value )
-{
-	std::stringstream ss;
-	ss << value;
-	return ss.str();
-}
+bool strToBool( const std::string &value );
+std::string boolToStr( bool value );
 
+int strToInt( const std::string &value );
+std::string intToStr( int value );
 
-template <class T>
-T strTo( const std::string& value )
-{
-	T result( 0 );
-	if( value.empty() )
-		return result;
-	std::stringstream ss;
-	ss << value;
-	ss >> result;
-	return result;
-}
+float strToFloat( const std::string &value );
+std::string floatToStr( float value );
+std::string floatToStr2( float value );
 
-std::string toStr( bool value );
-std::string toStr( const cocos2d::Point & point );
-std::string toStr( const cocos2d::Size & size );
-bool strToBool( const std::string & value );
-int strToInt( const std::string & value );
-float strToFloat( const std::string & value );
 cocos2d::Point strToPoint( const std::string & value );
+const std::string pointToStr( const cocos2d::Point & point );
+
 cocos2d::Size strToSize( const std::string & value );
 const std::string sizeToStr( const cocos2d::Size & size );
+
 cocos2d::Rect strToRect( const std::string & value );
 const std::string rectToStr( const cocos2d::Rect & rect );
+
 cocos2d::Color3B strToColor3B( const std::string & value );
-std::string color3BToStr( const cocos2d::Color3B& color );
+cocos2d::Color4B strToColor4B( const std::string & value );
+
 cocos2d::BlendFunc strToBlendFunc( const std::string & value );
 std::string blendFuncToStr( const cocos2d::BlendFunc & blendFunc );
-std::string floatToTimeString( float seconds );
+
+cocos2d::EventKeyboard::KeyCode strToKeyCode( const std::string & value );
+
 
 struct Strech
 {

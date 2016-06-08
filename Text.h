@@ -32,6 +32,8 @@ public:
 	virtual void setString( const std::string& newString ) override;
 	void setSourceString( const std::string& newString );
 	void useLocation( bool mode );
+	unsigned getFontSize()const;
+	void setFontSize( unsigned size );
 protected:
 	void onChangeLocalisation();
 private:
@@ -39,7 +41,8 @@ private:
 	std::string _sourceString;
 	CC_SYNTHESIZE_PASS_BY_REF( Strech, _strech, Strech );
 	CC_PROPERTY_PASS_BY_REF( std::string, _ttfFontName, TTFFontName );
-	CC_PROPERTY( unsigned, _ttfFontSize, TTFFontSize );
+	CC_PROPERTY_PASS_BY_REF( std::string, _systemFontName, SystemFontName );
+	unsigned _fontSize;
 };
 
 NS_CC_END

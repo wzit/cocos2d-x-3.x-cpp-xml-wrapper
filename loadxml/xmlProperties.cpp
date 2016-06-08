@@ -1,12 +1,12 @@
 /******************************************************************************/
 /*
- * Copyright 2014-2015 Vladimir Tolmachev
- *
- * Author: Vladimir Tolmachev
- * Project: ml
- * e-mail: tolm_vl@hotmail.com
- * If you received the code is not the author, please contact me
- */
+* Copyright 2014-2015 Vladimir Tolmachev
+*
+* Author: Vladimir Tolmachev
+* Project: ml
+* e-mail: tolm_vl@hotmail.com
+* If you received the code is not the author, please contact me
+*/
 /******************************************************************************/
 
 #include "types.h"
@@ -16,16 +16,17 @@
 #include "ImageManager.h"
 #include "NodeExt.h"
 #include "Language.h"
-#include "Panel.h"
 #include "Text.h"
-#include "mlUserData.h"
+#include "ShadersCache.h"
 #include "xmlProperties.h"
+#include "LayerBlur.h"
+
 
 NS_CC_BEGIN;
 
 namespace xmlLoader
 {
-	static std::deque<NodeExt *> _directories;
+	static std::deque<NodeExt*> _directories;
 	static std::map<std::string, const int> properties;
 	struct __autofillproperties
 	{
@@ -36,9 +37,7 @@ namespace xmlLoader
 			bookProperty( ksPos, kPos );
 			bookProperty( ksPosX, kPosX );
 			bookProperty( ksPosY, kPosY );
-			bookProperty( ksPosInterval, kPosInterval );
-			bookProperty( ksPosRadius, kPosRadius );
-			bookProperty( ksScale, kScale  );
+			bookProperty( ksScale, kScale );
 			bookProperty( ksStrech, kStrech ) ;
 			bookProperty( ksSize, kSize );
 			bookProperty( ksRotation, kRotation  );
@@ -50,27 +49,30 @@ namespace xmlLoader
 			bookProperty( ksCascadeColor, kCascadeColor  );
 			bookProperty( ksImage, kImage  );
 			bookProperty( ksBlending, kBlending );
-			bookProperty( ksAlias, kAlias );
 			bookProperty( ksOpacity, kOpacity );
 			bookProperty( ksColor, kColor  );
-			bookProperty( ksAnimation, kAnimation );
-			bookProperty( ksAction, kAction );
+			bookProperty( ksAnimation, kAnimation  );
 			bookProperty( ksName, kName );
 			bookProperty( ksAlignCols, kAlignCols ) ;
 			bookProperty( ksImageNormal, kImageNormal ) ;
 			bookProperty( ksImageSelected, kImageSelected  );
 			bookProperty( ksImageDisabled, kImageDisabled  );
-			bookProperty( ksEnabled, kEnabled );
 			bookProperty( ksText, kText  );
-			bookProperty( ksFont, kFont );
+			bookProperty( ksFont, kFont  );
 			bookProperty( ksFontTTF, kFontTTF );
 			bookProperty( ksFontSize, kFontSize );
-			bookProperty( ksMenuCallBack, kMenuCallBack  );
+			bookProperty( ksMenuCallBack, kMenuCallBack );
+			bookProperty( ksEnabled, kEnabled );
 			bookProperty( ksTextWidth, kTextWidth  );
 			bookProperty( ksTextAlign, kTextAlign );
+			bookProperty( ksEnableShadow, kEnableShadow );
+			bookProperty( ksEnableOutline, kEnableOutline );
+			bookProperty( ksEnableGlow, kEnableGlow);
+			bookProperty( ksDisableShadow, kDisableShadow );
 			bookProperty( ksScaleEffect, kScaleEffect  );
 			bookProperty( ksSound, kSound  );
 			bookProperty( ksTemplate, kTemplate );
+			bookProperty( ksPath, kPath );
 			bookProperty( ksAlignStartPosition, kAlignStartPosition );
 			bookProperty( ksGridSize, kGridSize );
 			bookProperty( ksScissorRect, kScissorRect );
@@ -78,19 +80,18 @@ namespace xmlLoader
 			bookProperty( ksScrollEnabled, kScrollEnabled );
 			bookProperty( ksAllowScrollByX, kAllowScrollByX );
 			bookProperty( ksAllowScrollByY, kAllowScrollByY );
-			bookProperty( ksPath, kPath);
-			bookProperty( ksDelayOnActivate, kDelayOnActivate );
-			bookProperty( ksFolder, kFolder );
-			bookProperty( ksDuration, kDuration );
-			bookProperty( ksHotLocalisation, kHotLocalisation );
-			bookProperty( ksMidPoint, kMidPoint );
-			bookProperty( ksPercent, kPercent );
-			bookProperty( ksBarRate, kBarRate );
+			bookProperty( ksMouseScrollEnabled, kMouseScrollEnabled );
+			bookProperty( ksMouseScrollSpeed, kMouseScrollSpeed );
 			bookProperty( ksProgressType, kProgressType );
-			bookProperty( ksResource, kResource );
+			bookProperty( ksPercent, kPercent );
+			bookProperty( ksMidPoint, kMidPoint );
+			bookProperty( ksBarChangeRate, kBarChangeRate );
+			bookProperty( ksUseBlur, kUseBlur );
+			bookProperty( ksProgressImage, kProgressImage );
+			bookProperty( ksShaderProgram, kShaderProgram );
 		}
 	};
-
+	__autofillproperties __autofillproperties__;
 
 	void bookProperty( const std::string & name, const int iname )
 	{
@@ -105,24 +106,27 @@ namespace xmlLoader
 		properties.insert( std::pair<std::string, const int>( name, iname ) );
 	}
 
-	std::string toStringProperty( int value )
-	{
-		for( auto property : properties )
-			if( property.second == value )
-				return property.first;
-		return "property noot found";
-	}
-
 	int strToPropertyType( const std::string &property )
 	{
 		static bool first( true );
 		if( first )
 		{
-			__autofillproperties __autofillproperties;
-			__autofillproperties.fill();
+			__autofillproperties__.fill();
 			first = false;
 		}
 		return properties[property];
+	}
+
+	std::string propertyTypeToStr( const int property )
+	{
+		for( auto pair : properties )
+		{
+			if( pair.second == property )
+			{
+				return pair.first;
+			}
+		}
+		return "";
 	}
 
 	void setProperty( Node* node, const std::string &property, const std::string &value )
@@ -147,11 +151,9 @@ namespace xmlLoader
 
 		Sprite * sprite = dynamic_cast<Sprite*>(node);
 		ScrollMenu* scrollmenu = dynamic_cast<ScrollMenu*>(node);
-		Menu * menu = dynamic_cast<Menu*>(node);
 		mlMenuItem * menuitem = dynamic_cast<mlMenuItem*>(node);
-		Panel* panel = dynamic_cast<Panel*>(node);
+		ProgressTimer* progress = dynamic_cast<ProgressTimer*>(node);
 		Text* text = dynamic_cast<Text*>(node);
-		ProgressTimer* timer = dynamic_cast<ProgressTimer*>(node);
 
 		const std::string& value = xmlLoader::macros::parse( rawvalue );
 
@@ -177,161 +179,106 @@ namespace xmlLoader
 					node->setName( value );
 					break;
 				case kVisible:
-					node->setVisible( strToBool( value ) );
+					node->setVisible( strTo<bool>( value ) );
 					break;
 				case kPos:
-					node->setPosition( strToPoint( value ) );
+					node->setPosition( strTo<Point>( value ) );
 					break;
-				case kPosX:
-					node->setPositionX( strToFloat( value ) );
+				case kPosX: 
+					node->setPositionX( strTo<float>( value ) );
 					break;
-				case kPosY:
-					node->setPositionY( strToFloat( value ) );
+				case kPosY: 
+					node->setPositionY( strTo<float>( value ) ); 
 					break;
-				case kPosInterval:
-				{
-					int k = value.find( "x" );
-					if( k != std::string::npos )
-					{
-						auto interval = []( const std::string& s )
-						{
-							int k = s.find( ".." );
-							if( k == std::string::npos )
-								return strTo<float>( s );
-							float l = strTo<float>( s.substr( 0, k ) );
-							float r = strTo<float>( s.substr( k + 2 ) );
-							if( l < r )
-							{
-								float v = r - l;
-								float result = CCRANDOM_0_1() * v + l;
-								return result;
-							}
-							return l;
-						};
-						std::string x = value.substr( 0, k );
-						std::string y = value.substr( k + 1 );
-						Point point( interval( x ), interval( y ) );
-						node->setPosition( point );
-					}
-					break;
-				}
-				case kPosRadius:
-				{
-					//pos="pos:50x50,radius:50,scale:1x0.5,circlepos=5,circlecount=10"
-					ParamCollection pc( value );
-					float radius = strTo<float>( pc.get( "radius" ) );
-					int pos = strTo<int>( pc.get( "circlepos" ) );
-					int count = strTo<int>( pc.get( "circlecount" ) );
-					std::vector<Point> p;
-					computePointsByRadius( p, radius, count, 0 );
-					Point point = p[pos];
-					if( pc.isExist( ksScale ) )
-					{
-						auto s = strToPoint( pc.get( ksScale ) );
-						point.x *= s.x;
-						point.y *= s.y;
-					}
-					point += strToPoint( pc.get( ksPos ) );
-					node->setPosition( point );
-					break;
-				}
-
 				case kScale:
-					point = strToPoint( value );
-					node->setScale( point.x, point.y );
+				{
+					if( value.find( "x" ) != std::string::npos )
+					{
+						point = strTo<Point>( value );
+						node->setScale( point.x, point.y );
+					}
+					else
+					{
+						float s = strTo<float>( value );
+						node->setScale( s );
+					}
 					break;
+				}
 				case kRotation:
-					node->setRotation( strToFloat( value ) );
+					node->setRotation( strTo<float>( value ) );
 					break;
 				case kCenter:
-					node->setAnchorPoint( strToPoint( value ) );
+					node->setAnchorPoint( strTo<Point>( value ) );
 					break;
 				case kStrech:
 				{
-					auto strech = strToStrech( value );
+					auto strech = strTo<Strech>( value );
 					strechNode( node, strech );
 					if( text )
 						text->setStrech( strech );
 					break;
 				}
 				case kSize:
-					size.width = strToPoint( value ).x;
-					size.height = strToPoint( value ).y;
+					size.width = strTo<Point>( value ).x;
+					size.height = strTo<Point>( value ).y;
 					node->setContentSize( size );
 					break;
 				case kTag:
-					node->setTag( strToInt( value ) );
+					node->setTag( strTo<int>( value ) );
 					break;
 				case kCascadeColor:
-					node->setCascadeColorEnabled( strToBool( value ) );
+					node->setCascadeColorEnabled( strTo<bool>( value ) );
 					break;
 				case kCascadeOpacity:
-					node->setCascadeOpacityEnabled( strToBool( value ) );
+					node->setCascadeOpacityEnabled( strTo<bool>( value ) );
 					break;
 				case kLocalZ:
-					node->setLocalZOrder( strToInt( value ) );
+					node->setLocalZOrder( strTo<int>( value ) );
 					break;
 				case kGlobalZ:
-					node->setGlobalZOrder( strToInt( value ) );
+					node->setGlobalZOrder( strTo<int>( value ) );
 					break;
 					//for sprite:
 				case kImage:
-					frame = ImageManager::shared().spriteFrame( value );
 					if( sprite )
 					{
+						frame = ImageManager::shared().spriteFrame( value );
 						if( frame )
 							sprite->setSpriteFrame( frame );
 						else
 							sprite->setTexture( value );
 					}
-					else if( timer )
+					else if( progress )
 					{
 						auto sprite = ImageManager::sprite( value );
 						if( sprite )
-							timer->setSprite( sprite );
+							progress->setSprite( sprite );
 					}
 					break;
 					//for scroll menu:
 				case kBlending:
-					assert( sprite );
-					sprite->setBlendFunc( strToBlendFunc(value) );
-					break;
-				case kAlias:
-					assert( sprite );
-					if( sprite && sprite->getTexture() )
-					{
-						bool fullscreen = mlUserData::getInstance()->get<bool>( "use_fullscreen", true );
-
-						if( fullscreen == false )
-						{
-							if( strToBool( value ) )
-								sprite->getTexture()->setAliasTexParameters();
-							else
-								sprite->getTexture()->setAntiAliasTexParameters();
-						}
-					}
+					assert( sprite || progress );
+					if( sprite )
+						sprite->setBlendFunc( strTo<BlendFunc>(value) );
+					else if( progress && progress->getSprite() )
+						progress->getSprite()->setBlendFunc( strTo<BlendFunc>( value ) );
 					break;
 				case kOpacity:
-					node->setOpacity( strToInt( value ) );
+					node->setOpacity( strTo<int>( value ) );
 					break;
 				case kColor:
-					node->setColor( strToColor3B( value ) );
+					node->setColor( strTo<Color3B>( value ) );
 					break;
 				case kAnimation:
-				case kAction:
-				{
-					auto action = xmlLoader::load_action( value );
-					if( action )
-						node->runAction( action );
+					node->runAction( xmlLoader::load_action( value ) );
 					break;
-				}
 				case kAlignCols:
 					assert( scrollmenu );
-					scrollmenu->setAlignedColums( strToInt( value ) );
+					scrollmenu->setAlignedColums( strTo<int>( value ) );
 					break;
-					//for mlMenuItem:
+					//for mlMenuItem & mlSlider:
 				case kImageNormal:
-					assert( menuitem );
+					assert( menuitem  );
 					if( menuitem )
 						menuitem->setImageNormal( value );
 					break;
@@ -345,14 +292,23 @@ namespace xmlLoader
 					if( menuitem )
 						menuitem->setImageDisabled( value );
 					break;
-				case kEnabled:
-					if( menuitem ) menuitem->setEnabled( strToBool( value ) );
-					if( menu ) menu->setEnabled( strToBool( value ) );
-					if( scrollmenu ) scrollmenu->setEnabled( strToBool( value ) );
-					break;
 				case kMenuCallBack:
 					assert( menuitem );
-					menuitem->setCallback( get_callback_by_description( value ) );
+					for( auto iter = _directories.rbegin(); iter != _directories.rend(); ++iter )
+					{
+						auto node = *iter;
+						auto callback = node->get_callback_by_description( value );
+						if( menuitem )
+							menuitem->setCallback( callback );
+						if( callback )
+							break;
+					}
+					break;
+				case kEnabled:
+					if( menuitem )
+						menuitem->setEnabled( strTo<bool>( value ) );
+					else
+						result = false;
 					break;
 				case kSound:
 					assert( menuitem );
@@ -364,7 +320,7 @@ namespace xmlLoader
 					std::string string = macros::parse( value );
 					string = language.string( string );
 					string = macros::parse( string );
-					if(menuitem) menuitem->setText( string );
+					if( menuitem ) menuitem->setText( string );
 					else if( text )
 					{
 						text->setString( string );
@@ -374,114 +330,182 @@ namespace xmlLoader
 				}
 				case kFont:
 					assert( menuitem || text );
-					if( text ) text->setBMFontFilePath( value );
-					else menuitem->setFont( value );
+					if( text )
+					{
+						if( value.find( ".fnt" ) != std::string::npos )
+							text->setBMFontFilePath( value );
+						else if( value.find( ".ttf" ) != std::string::npos )
+							text->setTTFFontName( value );
+						else
+							text->setSystemFontName( value );
+					}
+					else if( menuitem )
+					{
+						menuitem->setFont( value );
+					}
 					break;
 				case kFontTTF:
 					assert( menuitem || text );
 					if( text ) text->setTTFFontName( value );
-					else menuitem->setSystemFontName( value );
+					else menuitem->setTtfFontName( value );
 					break;
 				case kFontSize:
 					assert( menuitem || text );
-					if( text ) text->setTTFFontSize( strToInt( value ) );
-					else menuitem->setSystemFontSize( strToInt( value ) );
+					if( text ) text->setFontSize( strTo<int>( value ) );
+					else if( menuitem ) menuitem->setFontSize( strTo<int>( value ) );
 					break;
 				case kTextWidth:
 					assert( text );
-					if( text ) text->setMaxLineWidth( strToFloat( value ) );
+					if( text ) text->setWidth( strTo<float>( value ) );
 					break;
 				case kTextAlign:
 					assert( text );
 					if( text )
 					{
 						TextHAlignment align;
+#if CC_TARGET_PLATFORM != CC_PLATFORM_ANDROID
 						if( value == "center" ) align = TextHAlignment::CENTER;
 						else if( value == "right" ) align = TextHAlignment::RIGHT;
 						else align = TextHAlignment::LEFT;
+#else
+						if( value == "center" ) align = TextHAlignment::CENTER;
+						else if( value == "right" ) align = TextHAlignment::LEFT;
+						else align = TextHAlignment::RIGHT;
+#endif
 						text->setAlignment( align );
 					}
 					break;
+				case kEnableShadow:
+					assert( text );
+					if( text )
+					{
+						//"color:000000FF,offset:2x-2,blurradius:2"
+						ParamCollection pc( value );
+						auto color = strTo<Color4B>( pc.get( "color", "000000FF" ) );
+						auto offset = strTo<Size>( pc.get( "offset", "2x-2" ) );
+						auto blurradius = strTo<int>( pc.get( "blurradius", "0" ) );
+						text->enableShadow( color, offset, blurradius );
+					}
+					break;
+				case kEnableOutline:
+					assert( text );
+					if( text )
+					{
+						ParamCollection pc( value );
+						auto color = strTo<Color4B>( pc.get( "color", "000000FF" ) );
+						auto width = strTo<int>( pc.get( "width", "1" ) );
+						text->enableOutline( color, width );
+					}
+					break;
+				case kEnableGlow:
+					assert( text );
+					if( text )
+					{
+						auto color = strTo<Color4B>( value );
+						text->enableGlow( color );
+					}
+					break;
+				case kDisableShadow:
+					assert( text );
+					if( text ) text->disableEffect( LabelEffect::SHADOW );
+					break;
+				case kDisableOutline:
+					assert( text );
+					if( text ) text->disableEffect( LabelEffect::OUTLINE );
+					break;
+				case kDisableGlow:
+					assert( text );
+					if( text ) text->disableEffect( LabelEffect::GLOW );
+					break;
 				case kScaleEffect:
 					assert( menuitem );
-					menuitem->useScaleEffect( strToBool( value ) );
+					menuitem->useScaleEffect( strTo<bool>( value ) );
 					break;
 				case kAlignStartPosition:
 					assert( scrollmenu );
-					scrollmenu->setAlignedStartPosition( strToPoint( value ) );
+					scrollmenu->setAlignedStartPosition( strTo<Point>( value ) );
 					break;
 				case kGridSize:
 					assert( scrollmenu );
-					scrollmenu->setGrisSize( strToSize( value ) );
+					scrollmenu->setGrisSize( strTo<Size>( value ) );
 					break;
 				case kScissorRect:
 					assert( scrollmenu );
-					scrollmenu->setScissorRect( strToRect( value ) );
+					scrollmenu->setScissorRect( strTo<Rect>( value ) );
 					break;
 				case kScrollEnabled:
 					assert( scrollmenu );
-					scrollmenu->setScrollEnabled( strToBool( value ) );
+					scrollmenu->setScrollEnabled( strTo<bool>( value ) );
 					break;
 				case kScissorEnabled:
 					assert( scrollmenu );
-					scrollmenu->setScissorEnabled( strToBool( value ) );
+					scrollmenu->setScissorEnabled( strTo<bool>( value ) );
 					break;
 				case kAllowScrollByX:
 					assert( scrollmenu );
-					scrollmenu->setAllowScrollByX( strToBool( value ) );
+					scrollmenu->setAllowScrollByX( strTo<bool>( value ) );
 					break;
 				case kAllowScrollByY:
 					assert( scrollmenu );
-					scrollmenu->setAllowScrollByY( strToBool( value ) );
+					scrollmenu->setAllowScrollByY( strTo<bool>( value ) );
 					break;
-				case kDelayOnActivate:
-					assert( menuitem );
-					menuitem->setDelayOnActivate( strToFloat( value ) );
+				case kMouseScrollEnabled:
+					assert( scrollmenu && 0 );
+					//scrollmenu->setMouseScrollEnabled( strTo<bool>( value ) );
 					break;
-				case kFolder:
-					assert( panel );
-					panel->setFolder( value );
-					break;
-				case kHotLocalisation:
-					assert( text );
-					if( text )
-						text->useLocation( strToBool( value ) );
-					break;
-				case kMidPoint:
-					assert( timer );
-					if( timer )timer->setMidpoint( strToPoint( value ) );
-					break;
-				case kPercent:
-					assert( timer );
-					if( timer )timer->setPercentage( strToFloat( value ) );
-					break;
-				case kBarRate:
-					assert( timer );
-					if( timer )timer->setBarChangeRate( strToPoint( value ) );
+				case kMouseScrollSpeed:
+					assert( scrollmenu && 0 );
+					//scrollmenu->setMouseScrollSpeed( strTo<float>( value ) );
 					break;
 				case kProgressType:
-					assert( timer );
-					if( timer )
-					{
-						ProgressTimer::Type type( ProgressTimer::Type::RADIAL );
-						if( value == "radial" )type = ProgressTimer::Type::RADIAL;
-						else if( value == "bar" )type = ProgressTimer::Type::BAR;
-						else assert( 0 );
-						timer->setType( type );
-					}
+					if( progress )
+						progress->setType( value == "radial" ? ProgressTimer::Type::RADIAL : ProgressTimer::Type::BAR );
+					else
+						result = false;
 					break;
-				case kResource:
+				case kPercent:
+					if( progress )
+						progress->setPercentage( strTo<float>( value ) );
+					else
+						result = false;
+					break;
+				case kMidPoint:
+					if( progress )
+						progress->setMidpoint( strTo<Point>( value ) );
+					else
+						result = false;
+					break;
+				case kBarChangeRate:
+					if( progress )
+						progress->setBarChangeRate( strTo<Point>( value ) );
+					else
+						result = false;
+					break;
+				case kUseBlur:
+					assert( dynamic_cast<LayerBlur*>(node) );
+					dynamic_cast<LayerBlur*>(node)->setIsUseBlur( strTo<bool>( value ) );
+					break;
+				case kProgressImage:
+					break;
+				case kShaderProgram:
 				{
-					auto particle = dynamic_cast<ParticleSystemQuad*>(node);
-					if( particle )
-					{
-						particle->initWithFile( value );
-					}
-				}
+					GLProgram* program( nullptr );
+					if( value == "grayscale" )
+						program = ShaderCache::getInstance()->getGLProgram( GLProgram::SHADER_NAME_POSITION_GRAYSCALE );
+					else if( value == "default" )
+						program = ShaderCache::getInstance()->getGLProgram( GLProgram::SHADER_NAME_POSITION_TEXTURE_COLOR_NO_MVP );
+					else
+						program = CustomShadersCache::shared().program( value );
 
+					if( program )
+						node->setGLProgram( program );
+					else
+						log( "cannot create GL shader program by name or path: [%s]", value.c_str() );
+					break;
+				}
 				default:
 					result = false;
-					log_once( "property with name[%s] not dispathed node by name[%s]", toStringProperty( property ).c_str(), node->getName().c_str() );
+					log_once( "property with name[%d] not dispathed node by name[%s]", property, node->getName().c_str() );
 					break;
 			}
 		}
@@ -495,14 +519,15 @@ namespace xmlLoader
 			node->as_node_pointer()->retain();
 	}
 
-	void unbookDirectory()
+	void unbookDirectory( NodeExt* node )
 	{
-		if( _directories.empty() )
-			assert( 0 );
-		auto nodeext = _directories.back();
-		if( nodeext && nodeext->as_node_pointer() )
-			nodeext->as_node_pointer()->release();
-		_directories.pop_back();
+		auto iter = std::find( _directories.begin(), _directories.end(), node );
+		if( iter != _directories.end() )
+		{
+			if( node && node->as_node_pointer() )
+				node->as_node_pointer()->release();
+			_directories.erase( iter );
+		}
 	}
 
 	ccMenuCallback get_callback_by_description( const std::string& description )
@@ -518,8 +543,6 @@ namespace xmlLoader
 		}
 		return nullptr;
 	}
-
-
 };
 
 NS_CC_END

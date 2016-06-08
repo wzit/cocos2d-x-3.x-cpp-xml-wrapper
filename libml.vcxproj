@@ -137,6 +137,8 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="DataBase.cpp" />
+    <ClCompile Include="Generics.cpp" />
+    <ClCompile Include="LayerBlur.cpp" />
     <ClCompile Include="services\adcolony\adcolony_dummy.cpp" />
     <ClCompile Include="services\admob\AdMob.cpp" />
     <ClCompile Include="services\Advertisers.cpp" />
@@ -158,6 +160,7 @@
     <ClCompile Include="services\plugins\ServicePlugin.cpp" />
     <ClCompile Include="services\tapjoy\tapjoy_dummy.cpp" />
     <ClCompile Include="services\unityads\unityads_dummy.cpp" />
+    <ClCompile Include="ShadersCache.cpp" />
     <ClCompile Include="SplashScene.cpp" />
     <ClCompile Include="xtea\xtea.cpp" />
     <ClCompile Include="Animation.cpp" />
@@ -187,6 +190,8 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="DataBase.h" />
+    <ClInclude Include="Generics.h" />
+    <ClInclude Include="LayerBlur.h" />
     <ClInclude Include="services\adcolony\adcolony.h" />
     <ClInclude Include="services\admob\AdMob.h" />
     <ClInclude Include="services\Advertisers.h" />
@@ -202,6 +207,7 @@
     <ClInclude Include="services\plugins\ServicePlugin.h" />
     <ClInclude Include="services\tapjoy\tapjoy.h" />
     <ClInclude Include="services\unityads\unityads.h" />
+    <ClInclude Include="ShadersCache.h" />
     <ClInclude Include="SplashScene.h" />
     <ClInclude Include="xtea\xtea.h" />
     <ClInclude Include="Animation.h" />

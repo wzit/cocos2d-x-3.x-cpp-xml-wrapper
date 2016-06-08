@@ -216,178 +216,13 @@ void split( std::vector<std::string> & out, const std::string & values, const ch
 	while( true );
 }
 
-std::string toStr( bool value )
-{
-	return value ? "yes" : "no";
-};
-
-std::string toStr( const Point & point )
-{
-	return toStr( point.x ) + "x" + toStr( point.y );
-}
-
-std::string toStr( const Size & size )
-{
-	return toStr( size.width ) + "x" + toStr( size.height );
-}
-
-bool strToBool( const std::string & value )
-{
-	if( value.empty( ) )
-		return false;
-	bool result( false );
-	result = result || value == "yes";
-	result = result || value == "Yes";
-	result = result || value == "true";
-	result = result || value == "True";
-	return result;
-}
-
-int strToInt( const std::string & value )
-{
-	return value.empty( ) ? 0 :
-		atoi( value.c_str( ) );
-}
-
-float strToFloat( const std::string & value )
-{
-	size_t k = value.find( ".." );
-	if( k != std::string::npos )
-	{
-		auto l = strToFloat( value.substr( 0, k ) );
-		auto r = strToFloat( value.substr( k + 2 ) );
-		const float v = CCRANDOM_0_1() * (r - l) + l;
-		assert( l <= r );
-		assert( v >= l && v <= r );
-		return v;
-	}
-	return value.empty( ) ? 0.f : static_cast<float> (atof( value.c_str( ) ));
-}
-
-void computePointsByRadius(std::vector<Point> & out, float radius, unsigned countPoints, float startAngleInDegree)
-{
-	float delta = static_cast<float>(M_PI) * 2.0f / countPoints;
-	float startAngleInRadian = startAngleInDegree * static_cast<float>(M_PI) / 180.f;
-	out.resize(countPoints);
-	for( unsigned i=0; i<countPoints; ++i )
-	{
-		float angle = startAngleInRadian + delta * i;
-		out[i].x = radius * cos(angle);
-		out[i].y = radius * sin(angle);
-	}
-}
-
-Node * getNodeByTagsPath( Node * root, const std::list<int> & tagspath )
-{
-	std::list<int> tags = tagspath;
-	Node * node( root );
-	
-	while( node && tags.empty() == false )
-	{
-		node = node->getChildByTag( tags.front() );
-		tags.pop_front();
-	}
-
-	return node;
-}
-
-Node * getNodeByPath( Node * root, const std::string & path_names )
-{
-	std::list<std::string> names;
-	split( names, path_names, '/' );
-	Node * node( root );
-
-	while( node && names.empty( ) == false )
-	{
-		std::string name = names.front();
-		if( name == ".." )
-			node = node->getParent();
-		else if( name == "." )
-			node = node;
-		else if( name.empty() && path_names[0] == '/' )
-		{
-			node = node->getScene();
-			if( node == nullptr )
-				node = Director::getInstance()->getRunningScene();
-		}
-		else 
-			node = node->getChildByName( name );
-
-		names.pop_front( );
-	}
-
-	return node;
-}
-
-bool isFileExist( const std::string& path )
-{
-	auto isIni = path.find( "ini/" ) == 0;
-	auto isXml = path.find( ".xml" ) == path.size() - strlen( ".xml" );
-	if( isIni && isXml )
-	{
-		auto datFile = "dat/" + path.substr( 4, path.size() - 8 ) + ".dat";
-		if( FileUtils::getInstance()->isFileExist( datFile ) )
-			return true;
-	}
-
-	return FileUtils::getInstance()->isFileExist( path );
-}
-
-
-#if CC_TARGET_PLATFORM != CC_PLATFORM_IOS
-void openUrl( const std::string & url )
-{
-	JavaBind bind( "org.cocos2dx.cpp", "AppActivity", "openUrl", "%s" );
-	bind.call( url );
-}
-void openStoreUrl()
-{
-	JavaBind bind( "org.cocos2dx.cpp", "AppActivity", "openStoreUrl", "" );
-	bind.call();
-}
-#endif
-
-bool checkPointInNode( const cocos2d::Node * node, const cocos2d::Point & pointInParentSpace, int depth )
-{
-	if( !node )
-		return false;
-	cocos2d::Rect bb = node->getBoundingBox( );
-	cocos2d::Point point = pointInParentSpace;
-	
-	Node const* parent = node;
-	while( parent )
-	{
-		if( parent->isVisible( ) == false )
-			return false;
-		parent = parent->getParent( );
-	}
-	if( point.x > bb.origin.x &&
-		point.x < bb.origin.x + bb.size.width &&
-		point.y > bb.origin.y &&
-		point.y < bb.origin.y + bb.size.height )
-	{
-		return true;
-	}
-
-	//if( depth == 0 )return nullptr;
-	//
-	//cocos2d::Vector<cocos2d::Node*> children = node->getChildren( );
-	//
-	//for( int i = 0; i < children.size( ); ++i )
-	//{
-	//	const cocos2d::Node * child = dynamic_cast<cocos2d::Node*>(children.at( i ));
-	//	assert( child );
-	//	if( checkPointInNode( child, point, depth - 1 ) )
-	//		return true;
-	//}
-
-	return false;
-};
-
-
 cocos2d::Point strToPoint( const std::string & value )
 {
-	static Size frame = Director::getInstance()->getOpenGLView()->getDesignResolutionSize();
+	Size frame;
+
+	if( Director::getInstance()->getOpenGLView() )
+		frame = Director::getInstance()->getOpenGLView()->getDesignResolutionSize();
+
 	std::string string = value;
 
 	Point add;
@@ -477,8 +312,14 @@ cocos2d::Point strToPoint( const std::string & value )
 	cocos2d::Point p;
 	p.x = strToFloat( string.substr( 0, k ) );
 	p.y = strToFloat( string.substr( k + 1 ) );
-	
+
 	return p + add;
+}
+
+
+const std::string pointToStr( const Point & point )
+{
+	return floatToStr( point.x ) + "x" + floatToStr( point.y );
 }
 
 cocos2d::Size strToSize( const std::string & value )
@@ -489,7 +330,7 @@ cocos2d::Size strToSize( const std::string & value )
 
 const std::string sizeToStr( const cocos2d::Size & size )
 {
-	return toStr( size.width ) + "x" + toStr( size.height );
+	return floatToStr( size.width ) + "x" + floatToStr( size.height );
 }
 
 cocos2d::Rect strToRect( const std::string & value )
@@ -504,36 +345,42 @@ cocos2d::Rect strToRect( const std::string & value )
 
 const std::string rectToStr( const cocos2d::Rect & rect )
 {
-	std::string result = toStr( rect.origin ) + "," + toStr( Point( rect.size.width, rect.size.height ) );
+	std::string result = pointToStr( rect.origin ) + "," + pointToStr( Point( rect.size.width, rect.size.height ) );
 	return result;
 }
 
 cocos2d::Color3B strToColor3B( const std::string & value )
 {
-	assert( value.empty( ) || value.size( ) == 6 );
-	if( value.empty( ) ) return cocos2d::Color3B::WHITE;
+	assert( value.empty() || value.size() == 6 );
+	if( value.empty() ) return cocos2d::Color3B::WHITE;
 
 	const std::string r = value.substr( 0, 2 );
 	const std::string g = value.substr( 2, 2 );
 	const std::string b = value.substr( 4, 2 );
 	int R, G, B;
-	sscanf( r.c_str( ), "%x", &R );
-	sscanf( g.c_str( ), "%x", &G );
-	sscanf( b.c_str( ), "%x", &B );
+	sscanf( r.c_str(), "%x", &R );
+	sscanf( g.c_str(), "%x", &G );
+	sscanf( b.c_str(), "%x", &B );
 
 	return cocos2d::Color3B( GLubyte( R ), GLubyte( G ), GLubyte( B ) );
 }
 
-std::string color3BToStr( const cocos2d::Color3B& color )
+cocos2d::Color4B strToColor4B( const std::string & value )
 {
-	char buffer[7];
-	buffer[6] = 0x0;
-	sprintf( &buffer[0], "%02x", color.r );
-	sprintf( &buffer[2], "%02x", color.g );
-	sprintf( &buffer[4], "%02x", color.b );
-	std::string result( buffer );
-	assert( strToColor3B( result ) == color );
-	return result;
+	assert( value.empty() || value.size() == 8 );
+	if( value.empty() ) return cocos2d::Color4B::WHITE;
+
+	const std::string r = value.substr( 0, 2 );
+	const std::string g = value.substr( 2, 2 );
+	const std::string b = value.substr( 4, 2 );
+	const std::string a = value.substr( 6, 2 );
+	int R, G, B, A;
+	sscanf( r.c_str(), "%x", &R );
+	sscanf( g.c_str(), "%x", &G );
+	sscanf( b.c_str(), "%x", &B );
+	sscanf( a.c_str(), "%x", &A );
+
+	return cocos2d::Color4B( GLubyte( R ), GLubyte( G ), GLubyte( B ), GLubyte( A ) );
 }
 
 cocos2d::BlendFunc strToBlendFunc( const std::string & value )
@@ -543,7 +390,7 @@ cocos2d::BlendFunc strToBlendFunc( const std::string & value )
 	else if( value == "disable" )return BlendFunc::DISABLE;
 	else if( value == "alphapremultiplied" )return BlendFunc::ALPHA_PREMULTIPLIED;
 	else if( value == "alphanonpremultiplied" )return BlendFunc::ALPHA_NON_PREMULTIPLIED;
-	else log( "Warning: strToBlendFunc not know blending by string [%s]", value.c_str() );
+	else CCLOG( "Warning: strToBlendFunc not know blending by string [%s]", value.c_str() );
 	return BlendFunc::DISABLE;
 }
 
@@ -557,27 +404,78 @@ std::string blendFuncToStr( const cocos2d::BlendFunc & blendFunc )
 	return "";
 }
 
-std::string floatToTimeString( float seconds )
+std::string boolToStr( bool value )
 {
-	int sec = static_cast<int>(seconds);
-	int h = sec / (3600);
-	int m = (sec % 3600) / 60;
-	int s = sec % 60;
-	
-	std::string result;
-	if( h > 0 ) result = toStr( h ) + ":";
-	if( m > 0 || h > 0) result += toStr( m );
-	if( m > 0 ) result += ":";
-	result += toStr( s );
+	return value ? "yes" : "no";
+};
+
+std::string intToStr( int value )
+{
+	static char buffer[32];
+	buffer[0] = 0x0;
+	sprintf( buffer, "%d", value );
+	return buffer;
+};
+
+std::string floatToStr( float value )
+{
+	static char buffer[32];
+	buffer[0] = 0x0;
+	sprintf( buffer, "%.2f", value );
+	return buffer;
+};
+
+std::string floatToStr2( float value )
+{
+	static char buffer[32];
+	buffer[0] = 0x0;
+	sprintf( buffer, "%f", value );
+	return buffer;
+};
+
+bool strToBool( const std::string & value )
+{
+	if( value.empty() )
+		return false;
+	bool result( false );
+	result = result || value == "yes";
+	result = result || value == "Yes";
+	result = result || value == "true";
+	result = result || value == "True";
+	return result;
+}
+
+int strToInt( const std::string & value )
+{
+	return value.empty() ? 0 :
+		atoi( value.c_str() );
+}
+
+float strToFloat( const std::string & value )
+{
+	std::string::size_type k = value.find( ".." );
+	if( k != std::string::npos )
+	{
+		const float l = strToFloat( value.substr( 0, k ) );
+		const float r = strToFloat( value.substr( k + 2 ) );
+		const float v = static_cast<float>(CCRANDOM_0_1() * (r - l) + l);
+		assert( l <= r );
+		assert( v >= l && v <= r );
+		return v;
+	}
+	std::stringstream ss( value );
+	float result( 0 );
+	if( value.empty() == false )
+		ss >> result;
 	return result;
 }
 
 Strech::Strech()
-: mode( Mode::unknow )
-, maxScaleX(-1)
-, maxScaleY(-1)
-, minScaleX(-1)
-, minScaleY(-1)
+	: mode( Mode::unknow )
+	, maxScaleX( -1 )
+	, maxScaleY( -1 )
+	, minScaleX( -1 )
+	, minScaleY( -1 )
 {}
 
 bool Strech::empty()const
@@ -703,6 +601,127 @@ void strechNode( cocos2d::Node*node, const Strech& strech )
 	node->setScale( ssx, ssy );
 }
 
+void computePointsByRadius( std::vector<Point> & out, float radius, unsigned countPoints, float startAngleInDegree )
+{
+	float delta = static_cast<float>(M_PI) * 2.0f / countPoints;
+	float startAngleInRadian = startAngleInDegree * static_cast<float>(M_PI) / 180.f;
+	out.resize(countPoints);
+	for( unsigned i=0; i<countPoints; ++i )
+	{
+		float angle = startAngleInRadian + delta * i;
+		out[i].x = radius * cos(angle);
+		out[i].y = radius * sin(angle);
+	}
+}
+
+Node * getNodeByTagsPath( Node * root, const std::list<int> & tagspath )
+{
+	std::list<int> tags = tagspath;
+	Node * node( root );
+	
+	while( node && tags.empty() == false )
+	{
+		node = node->getChildByTag( tags.front() );
+		tags.pop_front();
+	}
+
+	return node;
+}
+
+Node * getNodeByPath( Node * root, const std::string & path_names )
+{
+	std::list<std::string> names;
+	split( names, path_names, '/' );
+	Node * node( root );
+
+	while( node && names.empty( ) == false )
+	{
+		std::string name = names.front();
+		if( name == ".." )
+			node = node->getParent();
+		else if( name == "." )
+			node = node;
+		else if( name.empty() && path_names[0] == '/' )
+		{
+			node = node->getScene();
+			if( node == nullptr )
+				node = Director::getInstance()->getRunningScene();
+		}
+		else 
+			node = node->getChildByName( name );
+
+		names.pop_front( );
+	}
+
+	return node;
+}
+
+bool isFileExist( const std::string& path )
+{
+	auto isIni = path.find( "ini/" ) == 0;
+	auto isXml = path.find( ".xml" ) == path.size() - strlen( ".xml" );
+	if( isIni && isXml )
+	{
+		auto datFile = "dat/" + path.substr( 4, path.size() - 8 ) + ".dat";
+		if( FileUtils::getInstance()->isFileExist( datFile ) )
+			return true;
+	}
+
+	return FileUtils::getInstance()->isFileExist( path );
+}
+
+
+#if CC_TARGET_PLATFORM != CC_PLATFORM_IOS
+void openUrl( const std::string & url )
+{
+	JavaBind bind( "org.cocos2dx.cpp", "AppActivity", "openUrl", "%s" );
+	bind.call( url );
+}
+void openStoreUrl()
+{
+	JavaBind bind( "org.cocos2dx.cpp", "AppActivity", "openStoreUrl", "" );
+	bind.call();
+}
+#endif
+
+bool checkPointInNode( const cocos2d::Node * node, const cocos2d::Point & pointInParentSpace, int depth )
+{
+	if( !node )
+		return false;
+	cocos2d::Rect bb = node->getBoundingBox( );
+	cocos2d::Point point = pointInParentSpace;
+	
+	Node const* parent = node;
+	while( parent )
+	{
+		if( parent->isVisible( ) == false )
+			return false;
+		parent = parent->getParent( );
+	}
+	if( point.x > bb.origin.x &&
+		point.x < bb.origin.x + bb.size.width &&
+		point.y > bb.origin.y &&
+		point.y < bb.origin.y + bb.size.height )
+	{
+		return true;
+	}
+
+	//if( depth == 0 )return nullptr;
+	//
+	//cocos2d::Vector<cocos2d::Node*> children = node->getChildren( );
+	//
+	//for( int i = 0; i < children.size( ); ++i )
+	//{
+	//	const cocos2d::Node * child = dynamic_cast<cocos2d::Node*>(children.at( i ));
+	//	assert( child );
+	//	if( checkPointInNode( child, point, depth - 1 ) )
+	//		return true;
+	//}
+
+	return false;
+};
+
+
 void fileLog( const std::string & s )
 {
 	FILE * file = fopen( "log.txt", "a+" );
@@ -788,4 +807,90 @@ ActionDisable * ActionDisable::clone() const
 	auto a = new (std::nothrow) ActionDisable();
 	a->autorelease();
 	return a;
+}
+
+
+const static std::map<std::string, EventKeyboard::KeyCode> keyCodeMap =
+{
+	{ "ESCAPE", EventKeyboard::KeyCode::KEY_ESCAPE },
+	{ "BACK", EventKeyboard::KeyCode::KEY_BACK },
+	{ "BACKSPACE", EventKeyboard::KeyCode::KEY_BACKSPACE },
+	{ "TAB", EventKeyboard::KeyCode::KEY_TAB },
+	{ "RETURN", EventKeyboard::KeyCode::KEY_RETURN },
+	{ "SHIFT", EventKeyboard::KeyCode::KEY_SHIFT },
+	{ "LEFT_SHIFT", EventKeyboard::KeyCode::KEY_LEFT_SHIFT },
+	{ "RIGHT_SHIFT", EventKeyboard::KeyCode::KEY_RIGHT_SHIFT },
+	{ "CTRL", EventKeyboard::KeyCode::KEY_CTRL },
+	{ "LEFT_CTRL", EventKeyboard::KeyCode::KEY_LEFT_CTRL },
+	{ "RIGHT_CTRL", EventKeyboard::KeyCode::KEY_RIGHT_CTRL },
+	{ "ALT", EventKeyboard::KeyCode::KEY_ALT },
+	{ "LEFT_ALT", EventKeyboard::KeyCode::KEY_LEFT_ALT },
+	{ "RIGHT_ALT", EventKeyboard::KeyCode::KEY_RIGHT_ALT },
+	{ "LEFT_ARROW", EventKeyboard::KeyCode::KEY_LEFT_ARROW },
+	{ "RIGHT_ARROW", EventKeyboard::KeyCode::KEY_RIGHT_ARROW },
+	{ "UP_ARROW", EventKeyboard::KeyCode::KEY_UP_ARROW },
+	{ "DOWN_ARROW", EventKeyboard::KeyCode::KEY_DOWN_ARROW },
+	{ "SPACE", EventKeyboard::KeyCode::KEY_SPACE },
+	{ "F1", EventKeyboard::KeyCode::KEY_F1 },
+	{ "F2", EventKeyboard::KeyCode::KEY_F2 },
+	{ "F3", EventKeyboard::KeyCode::KEY_F3 },
+	{ "F4", EventKeyboard::KeyCode::KEY_F4 },
+	{ "F5", EventKeyboard::KeyCode::KEY_F5 },
+	{ "F6", EventKeyboard::KeyCode::KEY_F6 },
+	{ "F7", EventKeyboard::KeyCode::KEY_F7 },
+	{ "F8", EventKeyboard::KeyCode::KEY_F8 },
+	{ "F9", EventKeyboard::KeyCode::KEY_F9 },
+	{ "F10", EventKeyboard::KeyCode::KEY_F10 },
+	{ "F11", EventKeyboard::KeyCode::KEY_F11 },
+	{ "F12", EventKeyboard::KeyCode::KEY_F12 },
+	{ "0", EventKeyboard::KeyCode::KEY_0 },
+	{ "1", EventKeyboard::KeyCode::KEY_1 },
+	{ "2", EventKeyboard::KeyCode::KEY_2 },
+	{ "3", EventKeyboard::KeyCode::KEY_3 },
+	{ "4", EventKeyboard::KeyCode::KEY_4 },
+	{ "5", EventKeyboard::KeyCode::KEY_5 },
+	{ "6", EventKeyboard::KeyCode::KEY_6 },
+	{ "7", EventKeyboard::KeyCode::KEY_7 },
+	{ "8", EventKeyboard::KeyCode::KEY_8 },
+	{ "9", EventKeyboard::KeyCode::KEY_9 },
+	{ "A", EventKeyboard::KeyCode::KEY_A },
+	{ "B", EventKeyboard::KeyCode::KEY_B },
+	{ "C", EventKeyboard::KeyCode::KEY_C },
+	{ "D", EventKeyboard::KeyCode::KEY_D },
+	{ "E", EventKeyboard::KeyCode::KEY_E },
+	{ "F", EventKeyboard::KeyCode::KEY_F },
+	{ "G", EventKeyboard::KeyCode::KEY_G },
+	{ "H", EventKeyboard::KeyCode::KEY_H },
+	{ "I", EventKeyboard::KeyCode::KEY_I },
+	{ "J", EventKeyboard::KeyCode::KEY_J },
+	{ "K", EventKeyboard::KeyCode::KEY_K },
+	{ "L", EventKeyboard::KeyCode::KEY_L },
+	{ "M", EventKeyboard::KeyCode::KEY_M },
+	{ "N", EventKeyboard::KeyCode::KEY_N },
+	{ "O", EventKeyboard::KeyCode::KEY_O },
+	{ "P", EventKeyboard::KeyCode::KEY_P },
+	{ "Q", EventKeyboard::KeyCode::KEY_Q },
+	{ "R", EventKeyboard::KeyCode::KEY_R },
+	{ "S", EventKeyboard::KeyCode::KEY_S },
+	{ "T", EventKeyboard::KeyCode::KEY_T },
+	{ "U", EventKeyboard::KeyCode::KEY_U },
+	{ "V", EventKeyboard::KeyCode::KEY_V },
+	{ "W", EventKeyboard::KeyCode::KEY_W },
+	{ "X", EventKeyboard::KeyCode::KEY_X },
+	{ "Y", EventKeyboard::KeyCode::KEY_Y },
+	{ "Z", EventKeyboard::KeyCode::KEY_Z },
+	{ "TILDE", EventKeyboard::KeyCode::KEY_TILDE },
+	{ "ENTER", EventKeyboard::KeyCode::KEY_ENTER },
+	{ "GRAVE", EventKeyboard::KeyCode::KEY_GRAVE }
+};
+
+EventKeyboard::KeyCode strToKeyCode( const std::string & value )
+{
+	auto iter = keyCodeMap.find( value );
+	if( iter != keyCodeMap.end() )
+	{
+		return iter->second;
+	}
+	assert( 0 );
+	return EventKeyboard::KeyCode::KEY_NONE;
 }

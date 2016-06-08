@@ -95,7 +95,22 @@ void NodeExt::load( const pugi::xml_node & root )
 {
 	xmlLoader::bookDirectory( this );
 	xmlLoader::load( as_node_pointer(), root );
-	xmlLoader::unbookDirectory();
+	xmlLoader::unbookDirectory(this);
+}
+
+void NodeExt::onLoaded()
+{
+	auto node = as_node_pointer();
+	if( node )
+	{
+		auto children = node->getChildren();
+		for( auto child : children )
+		{
+			auto nodeext = dynamic_cast<NodeExt*>(child);
+			if( nodeext )
+				nodeext->onLoaded();
+		}
+	}
 }
 
 bool NodeExt::runEvent( const std::string & eventname )

@@ -415,7 +415,7 @@ void EventCreateNode::execute( NodeExt * context )
 	{
 		xmlLoader::bookDirectory( context );
 		auto node = xmlLoader::load_node( path );
-		xmlLoader::unbookDirectory();
+		xmlLoader::unbookDirectory( context );
 		if( node )
 			create( node );
 	}

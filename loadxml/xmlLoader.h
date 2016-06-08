@@ -11,9 +11,9 @@
 
 #ifndef __xmlLoader_h__
 #define __xmlLoader_h__
+#include "Crypto.h"
 #include "macroses.h"
 #include "pugixml/pugixml.hpp"
-#include "Crypto.h"
 
 class ParamCollection;
 NS_CC_BEGIN;
@@ -40,8 +40,11 @@ namespace xmlLoader
 
 	std::string object_type( const std::string & file );
 
-	NodePointer load_node( const std::string & file );
-	NodePointer load_node( const pugi::xml_node & xmlnode );
+	NodePointer load_node( const std::string & file, const std::string& topType = "", int depth = 0 );
+	NodePointer load_node( pugi::xml_node xmlnode, const std::string& topType = "", int depth = 0 );
+	void load( Node* node, pugi::xml_node xmlnode, int depth = 0 );
+	void load( Node* node, const std::string & path, int depth = 0 );
+	void load_children( Node* node, pugi::xml_node xmlnode, int depth = 0 );
 
 	template <class T>
 	IntrusivePtr<T> load_node( const std::string & file )
@@ -60,17 +63,14 @@ namespace xmlLoader
 		result.reset( dynamic_cast<T*>(node.ptr()) );
 		return result;
 	};
+	IntrusivePtr<EventBase> load_event( const pugi::xml_node xmlnode );
 
-	ActionPointer load_action_from_file( const std::string & file );
-	ActionPointer load_action( const pugi::xml_node & xmlnode );
+	ActionPointer load_action( const pugi::xml_node xmlnode );
+	ActionPointer load_action_from_file( const std::string & path );
 	ActionPointer load_action( const std::string & desc );
 
-	IntrusivePtr<EventBase> load_event( const pugi::xml_node & xmlnode );
-	void load( Node* node, const pugi::xml_node & xmlnode, bool ignoreTemplate = false );
-	void load( Node* node, const std::string & path );
-	void load_children( Node* node, const pugi::xml_node & xmlnode );
-
-	void load( ParamCollection * params, const std::string & path );
+	void load_paramcollection( ParamCollection& params, const std::string & path );
+	void load_paramcollection( ParamCollection& params, const pugi::xml_node xmlnode );
 
 
 	namespace k
@@ -108,8 +108,10 @@ namespace xmlLoader
 		const std::string ActionSineIn( "SineIn" );
 		const std::string ActionSineOut( "SineOut" );
 		const std::string ActionSineInOut( "SineInOut" );
+		const std::string ActionBezier( "Bezier" );
 		const std::string ActionAnimate( "Animate" );
 		const std::string ActionRemoveSelf( "RemoveSelf" );
+		const std::string ActionText( "Text" );
 		const std::string ActionShow( "Show" );
 		const std::string ActionHide( "Hide" );
 		const std::string ActionEnable( "Enable" );

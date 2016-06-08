@@ -3,7 +3,7 @@
 * Copyright 2014-2015 Vladimir Tolmachev
 *
 * Author: Vladimir Tolmachev
-* Project: Defense of Greece
+* Project: ml
 * e-mail: tolm_vl@hotmail.com
 * If you received the code is not the author, please contact me
 */
@@ -15,10 +15,9 @@ NS_CC_BEGIN;
 
 namespace AStar
 {
-	mlTimer perfomancer;
-
 	Map::Cells find( Map & map, Map::Cell_ptr start, Map::Cell_ptr goal )
 	{
+		map.clearCells();
 		Map::Cells closedset;
 		Map::Cells openset;
 		support::add( openset, start );
@@ -31,42 +30,42 @@ namespace AStar
 		{
 			support::sort_f( openset );
 
-			Map::Cell_ptr x = openset.front();
-			if( x == goal )
+			Map::Cell_ptr c = openset.front();
+			if( c == goal )
 			{
 				return reconstruct_path( start, goal );
 			}
 
-			support::remove( openset, x );
-			support::add( closedset, x );
+			support::remove( openset, c );
+			support::add( closedset, c );
 
-			Map::Cells neighbors = map.neighbors( x );
-			for( auto y : neighbors )
+			Map::Cells neighbors = map.neighbors( c );
+			for( auto n : neighbors )
 			{
-				auto exist = support::exist( closedset, y );
+				auto exist = support::exist( closedset, n );
 				if( exist )
 					continue;
 
-				auto tentative_g_score = x->g + map.heuristic_cost_estimate( x, y );
-				
+				auto tentative_g_score = c->g + map.heuristic_cost_estimate( c, n );
+
 				bool tentative_is_better( false );
-				exist = support::exist( openset, y );
+				exist = support::exist( openset, n );
 				if( exist == false )
 				{
-					support::add( openset, y );
+					support::add( openset, n );
 					tentative_is_better = true;
 				}
 				else
 				{
-					tentative_is_better = tentative_g_score < y->g;
+					tentative_is_better = tentative_g_score < n->g;
 				}
 
 				if( tentative_is_better == true )
 				{
-					y->came_from = x;
-					y->g = tentative_g_score;
-					y->h = map.heuristic_cost_estimate( y, goal );
-					y->f = y->g + y->h;
+					n->came_from = c;
+					n->g = tentative_g_score;
+					n->h = map.heuristic_cost_estimate( n, goal );
+					n->f = n->g + n->h;
 				}
 			}
 		}
@@ -94,23 +93,30 @@ namespace AStar
 		return path_map;
 	}
 
-	Map::Map( int width, int height )
-		: _width( width )
-		, _height( height )
+	Map::Map( int rows, int cols)
+		: _rows( rows )
+		, _cols( cols )
 	{
-		for( int i = 0; i < _width * _height; ++i )
+		for( int i = 0; i < _rows * _cols; ++i )
 		{
-			Cell_ptr c = new Cell( i / _width, i % height );
+			Cell_ptr c = new Cell( i / _cols, i % _cols );
 			_data.push_back( c );
 		}
 	}
 
-
-	Map::Cell_ptr Map::cell( int x, int y )
+	Map::~Map()
 	{
-		assert( x < _width );
-		assert( y < _height );
-		return _data[x * _width + y];
+		for( auto cell : _data )
+		{
+			delete cell;
+		}
+	}
+
+	Map::Cell_ptr Map::cell( int row, int col )
+	{
+		assert( row < _rows );
+		assert( col < _cols );
+		return _data[row * _cols + col];
 	}
 
 	Map::Cells Map::neighbors( Cell_ptr cell )
@@ -118,23 +124,23 @@ namespace AStar
 		Cells Cells;
 
 		int array[][2] = {
-			{ -1, -1 },
+			//{ -1, -1 },
 			{ -1, +0 },
-			{ -1, +1 },
+			//{ -1, +1 },
 			{ +0, -1 },
 			{ +0, +1 },
-			{ +1, -1 },
+			//{ +1, -1 },
 			{ +1, +0 },
-			{ +1, +1 },
+			//{ +1, +1 },
 		};
 
 		for( auto c : array )
 		{
-			int x = cell->x + c[0];
-			int y = cell->y + c[1];
-			if( x < 0 || x > _width - 1 ) continue;
-			if( y < 0 || y > _height - 1 ) continue;
-			auto cell = _data[x * _width + y];
+			int row = cell->_row + c[0];
+			int col = cell->_col + c[1];
+			if( row < 0 || row > _rows - 1 ) continue;
+			if( col < 0 || col > _cols - 1 ) continue;
+			auto cell = _data[row * _cols + col];
 			if( cell->passed == false ) continue;
 			Cells.push_back( cell );
 		}
@@ -144,24 +150,40 @@ namespace AStar
 
 	float Map::heuristic_cost_estimate( Cell_ptr a, Cell_ptr b )
 	{
-		int x = a->x - b->x;
-		int y = a->y - b->y;
-		return float( x*x + y*y );
+		int r = a->_row - b->_row;
+		int c = a->_col - b->_col;
+		return float( r*r + c*c );
 	}
 
-	Cell::Cell( int _x, int _y )
-		: x( _x )
-		, y( _y )
+	void Map::clearCells()
+	{
+		for( auto cell : _data )
+		{
+			cell->g = 0;
+			cell->h = 0;
+			cell->f = 0;
+			cell->came_from = nullptr;
+		}
+	}
+
+	Cell::Cell( int _row, int _col )
+		: _row( _row )
+		, _col( _col )
 		, g( 0 )
 		, h( 0 )
 		, f( 0 )
 		, came_from()
-		, passed( 0 )
+		, passed( false )
 	{}
 
 	void Cell::setPassed( bool value )
 	{
 		this->passed = value;
+	}
+	
+	bool Cell::isPassed()const
+	{
+		return this->passed;
 	}
 
 	void support::remove( Map::Cells & Cells, Map::Cell_ptr cell )

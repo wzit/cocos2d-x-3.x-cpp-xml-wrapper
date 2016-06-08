@@ -240,14 +240,14 @@ void mlMenuItem::setFont( const std::string & fontfile )
 	buildText();
 }
 
-void mlMenuItem::setSystemFontName( const std::string & fontname )
+void mlMenuItem::setTtfFontName( const std::string & fontname )
 {
 	if( _fontTTF == fontname )return;
 	_fontTTF = fontname;
 	buildText();
 }
 
-void mlMenuItem::setSystemFontSize( int fontsize )
+void mlMenuItem::setFontSize( int fontsize )
 {
 	if( _fontSize == fontsize )return;
 	_fontSize = fontsize;

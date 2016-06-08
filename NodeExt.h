@@ -51,7 +51,7 @@ public:
 	virtual void load( const std::string & directory, const std::string & xmlFile )final;
 	virtual void load( const std::string & pathToXmlFile )final;
 	virtual void load( const pugi::xml_node & root );
-
+	virtual void onLoaded();
 public:
 	virtual bool setProperty( int intproperty, const std::string & value );
 	virtual bool setProperty( const std::string & stringproperty, const std::string & value );

@@ -16,7 +16,8 @@
 NS_CC_BEGIN
 
 Text::Text()
-: _ttfFontSize(50)
+: _fontSize(50)
+, _systemFontName( "Tahoma" )
 {
 	useLocation( true );
 }
@@ -83,9 +84,16 @@ void Text::onChangeLocalisation()
 void Text::setTTFFontName( const std::string& font )
 {
 	_ttfFontName = font;
-	TTFConfig ttfConfig( _ttfFontName.c_str(), _ttfFontSize, GlyphCollection::DYNAMIC );
+	TTFConfig ttfConfig( _ttfFontName.c_str(), _fontSize, GlyphCollection::DYNAMIC );
 	setTTFConfig( ttfConfig );
 	setString( getString() );
+}
+
+void Text::setSystemFontName( const std::string& font )
+{
+	_systemFontName = font;
+	Label::setSystemFontSize( _fontSize );
+	Label::setSystemFontName( _systemFontName );
 }
 
 const std::string& Text::getTTFFontName()const
@@ -93,17 +101,30 @@ const std::string& Text::getTTFFontName()const
 	return _ttfFontName;
 }
 
-void Text::setTTFFontSize( unsigned size )
+const std::string& Text::getSystemFontName()const
 {
-	_ttfFontSize = size;
-	TTFConfig ttfConfig( _ttfFontName.c_str(), _ttfFontSize, GlyphCollection::DYNAMIC );
-	setTTFConfig( ttfConfig );
-	setString( getString() );
+	return _systemFontName;
 }
 
-unsigned Text::getTTFFontSize()
+void Text::setFontSize( unsigned size )
 {
-	return _ttfFontSize;
+	_fontSize = size;
+	if( _ttfFontName.empty() == false )
+	{
+		TTFConfig ttfConfig( _ttfFontName.c_str(), _fontSize, GlyphCollection::DYNAMIC );
+		setTTFConfig( ttfConfig );
+		setString( getString() );
+	}
+	else if( _systemFontName.empty() == false && _bmFontPath.empty() )
+	{
+		Label::setSystemFontSize( _fontSize );
+		Label::setSystemFontName( _systemFontName );
+	}
+}
+
+unsigned Text::getFontSize()const
+{
+	return _fontSize;
 }
 
 NS_CC_END

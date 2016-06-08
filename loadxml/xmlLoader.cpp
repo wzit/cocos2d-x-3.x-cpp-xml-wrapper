@@ -15,6 +15,7 @@
 #include "ScrollMenu.h"
 #include "Animation.h"
 #include "ParamCollection.h"
+#include "ImageManager.h"
 #include "xmlLoader.h"
 #include "xmlProperties.h"
 #include "Crypto.h"
@@ -53,8 +54,8 @@ namespace xmlLoader
 	}
 
 
-	void load_scrollmenu_items( ScrollMenu* menu, const pugi::xml_node & xmlnode );
-	void load_nonscissor_children( ScrollMenu* menu, const pugi::xml_node & xmlnode );
+	void load_scrollmenu_items( ScrollMenu* menu, pugi::xml_node xmlnode, int depth );
+	void load_nonscissor_children( ScrollMenu* node, pugi::xml_node xmlnode, int depth );
 	void load_paralax_children( ParallaxNode* menu, const pugi::xml_node & xmlnode );
 
 	std::string object_type( const std::string & file )
@@ -75,43 +76,251 @@ namespace xmlLoader
 		return "";
 	}
 
-	NodePointer load_node( const std::string & file )
+	NodePointer load_node( const std::string & file, const std::string& topType, int depth )
 	{
 		auto doc = getDoc( file );
 		auto root = doc->root().first_child();
-		return root ? load_node( root ) : nullptr;
+		NodePointer result = load_node( root, topType, depth );
+		return result;
 	}
 
-	IntrusivePtr<Node> load_node( const pugi::xml_node & xmlnode )
+	IntrusivePtr<Node> load_node( pugi::xml_node xmlnode, const std::string& topType, int depth )
 	{
-		const std::string& type = xmlnode.attribute( ksType.c_str() ).as_string();
-		const std::string& template_ = xmlnode.attribute( ksTemplate.c_str() ).as_string();
+		ParamCollection macroses( xmlnode.attribute( "macroses" ).as_string() );
+		xmlnode.remove_attribute( "macroses" );
+		for( auto pair : macroses )
+			macros::set( pair.first, pair.second );
+
+		const std::string& type = topType.empty() ? xmlnode.attribute( ksType.c_str() ).as_string() : topType;
+		const std::string& template_ = macros::parse( xmlnode.attribute( ksTemplate.c_str() ).as_string() );
+		
+		IntrusivePtr<Node> result;
 		if( template_.empty() )
 		{
-			if( type.empty() )
-			{
-				log( "xmlLoader (load_node): empty type. xml node path: [%s]", xmlnode.path().c_str() );
-			}
-			auto node = Factory::shared().build<Node>( type );
-			auto nodeext = dynamic_cast<NodeExt*>(node.ptr());
-			if( nodeext )
-				bookDirectory( nodeext );
-			load( node.ptr(), xmlnode, false );
-			if( nodeext )
-				unbookDirectory();
-
-			return node;
+			result = Factory::shared().build<Node>( type );
+			if( result )
+				load( result.ptr(), xmlnode, depth );
 		}
 		else
 		{
-			auto node = load_node( template_ );
+			result = load_node( template_, type, depth + 1 );
 			pugi::xml_node xmlnodem = xmlnode;
-			load( node, xmlnodem, true );
-			return node;
+			xmlnodem.remove_attribute( ksTemplate.c_str() );
+			load( result, xmlnodem, depth + 1 );
+		}
+		if( depth == 0 && dynamic_cast<NodeExt*>(result.ptr()) )
+		{
+			dynamic_cast<NodeExt*>(result.ptr())->onLoaded();
+		}
+		return result;
+	}
+
+	void load( Node* node, const std::string & path, int depth )
+	{
+		pugi::xml_document *doc( nullptr );
+		doc = new pugi::xml_document;
+		doc->load_file( path.c_str() );
+		load( node, doc->root().first_child(), depth );
+		delete doc;
+	}
+
+	void load( Node* node, pugi::xml_node xmlnode, int depth )
+	{
+		//const std::string& type = xmlnode.attribute( ksType.c_str() ).as_string();
+		std::string template_ = xmlnode.attribute( ksTemplate.c_str() ).as_string();
+		ParamCollection macroses( xmlnode.attribute( "macroses").as_string() );
+		xmlnode.remove_attribute( "macroses" );
+		for( auto pair : macroses )
+		{
+			macros::set( pair.first, pair.second );
+		}
+		
+		if( template_.empty() == false )
+		{
+			load( node, template_, depth + 1 );
+		}
+		auto nodeext = dynamic_cast<NodeExt*>(node);
+		if( nodeext)
+			bookDirectory( nodeext );
+
+		for( auto attr = xmlnode.first_attribute(); attr; attr = attr.next_attribute() )
+		{
+			const std::string name = attr.name();
+			xmlLoader::setProperty( node, name, attr.value() );
+		}
+		while( true )
+		{
+			auto attr = xmlnode.first_attribute();
+			if( attr )
+				xmlnode.remove_attribute( attr );
+			else
+				break;
+		}
+
+		for( auto xmlentity : xmlnode )
+		{
+			const std::string& tag = xmlentity.name();
+			if( tag == "children" )
+				load_children( node, xmlentity, depth );
+			else if( tag == "items" )/*&& type == "scrollmenu"*/ //remove checking type for template
+			{
+				ScrollMenu* scrollmenu = dynamic_cast<ScrollMenu*>(node);
+				assert( scrollmenu );
+				load_scrollmenu_items( scrollmenu, xmlentity, depth );
+			}
+			else if( tag == "children_nonscissor" )
+			{
+				ScrollMenu* scrollmenu = dynamic_cast<ScrollMenu*>(node);
+				assert( scrollmenu );
+				if( scrollmenu )
+				{
+					load_nonscissor_children( scrollmenu, xmlentity, depth );
+				}
+			}
+			else if( tag == "actions" )
+			{
+				NodeExt * nodeext = dynamic_cast<NodeExt*>(node);
+				assert( nodeext );
+				nodeext->loadActions( xmlentity );
+			}
+			else if( tag == "events" )
+			{
+				NodeExt * nodeext = dynamic_cast<NodeExt*>(node);
+				assert( nodeext );
+				nodeext->loadEvents( xmlentity );
+			}
+			else if( tag == "macroses" )
+			{
+				for( auto xmlmacros : xmlentity )
+				{
+					auto name = xmlmacros.attribute( "name" ).as_string();
+					auto value = xmlmacros.attribute( "value" ).as_string();
+					macros::set( name, value );
+				}
+			}
+			else
+			{
+				bool result( false );
+				NodeExt * nodeext = dynamic_cast<NodeExt*>(node);
+				if( nodeext )
+				{
+					result = nodeext->loadXmlEntity( tag, xmlentity );
+				}
+
+				if( !result )
+				{
+					log_once( "xml node will not reading. path=[%s]", xmlentity.path().c_str() );
+				}
+			}
+
+		}
+
+		if( nodeext )
+		{
+			unbookDirectory( nodeext );
 		}
 	}
 
-	IntrusivePtr<EventBase> load_event( const pugi::xml_node & xmlnode )
+	NodePointer getorbuild_node( Node * node, pugi::xml_node xmlnode, int depth )
+	{
+		const std::string& type = xmlnode.attribute( ksType.c_str() ).as_string();
+		const std::string& name = xmlnode.attribute( ksName.c_str() ).as_string();
+		const std::string& path = xmlnode.attribute( ksPath.c_str() ).as_string();
+		const std::string& template_ = macros::parse( xmlnode.attribute( ksTemplate.c_str() ).as_string() );
+
+		ParamCollection macroses( xmlnode.attribute( "macroses" ).as_string() );
+		xmlnode.remove_attribute("macroses" );
+		for( auto pair : macroses )
+		{
+			macros::set( pair.first, pair.second );
+		}
+
+		NodePointer child( nullptr );
+		if( child == nullptr && path.empty() == false )
+		{
+			child = getNodeByPath( node, path );
+		}
+		if( child == nullptr && name.empty() == false )
+		{
+			child = node->getChildByName( name );
+		}
+		if( child && template_.empty() == false )
+		{
+			load( child, template_, depth );
+		}
+		if( child == nullptr && template_.empty() == false )
+		{
+			child = load_node( template_, type, depth );
+			xmlnode.remove_attribute( ksTemplate.c_str() );
+		}
+		if( child && type.empty() == false )
+		{
+			//CCLOG( "Warning! type redifinited name[%s] type[%s]", name.c_str(), type.c_str() );
+		}
+		if( child == nullptr )
+		{
+			child = Factory::shared().build<Node>( type );
+		}
+		if( !child )
+		{
+			CCLOG( "xmlLoader: getorbuild_node" );
+			CCLOG( "name: [%s]", name.c_str() );
+			CCLOG( "type: [%s]", type.c_str() );
+			CCLOG( "path: [%s]", path.c_str() );
+			CCLOG( "template: [%s]", template_.c_str() );
+		}
+		return child;
+	}
+
+	void load_children( Node* node, pugi::xml_node xmlnode, int depth )
+	{
+		FOR_EACHXML_BYTAG( xmlnode, xmlchild, "node" )
+		{
+			auto child = getorbuild_node( node, xmlchild, depth );
+			assert( child );
+			if( child == nullptr )
+				continue;
+			load( child, xmlchild, depth );
+			if( child->getParent() == nullptr )
+			{
+				node->addChild( child, child->getLocalZOrder() );
+			}
+		}
+	}
+
+	void load_scrollmenu_items( ScrollMenu* menu, pugi::xml_node xmlnode, int depth )
+	{
+		for( auto xmlitem : xmlnode )
+		{
+			const std::string& imageN = macros::parse( xmlitem.attribute( "imageN" ).as_string() );
+			const std::string& imageS = macros::parse( xmlitem.attribute( "imageS" ).as_string() );
+			const std::string& imageD = macros::parse( xmlitem.attribute( "imageD" ).as_string() );
+			const std::string& text = macros::parse( xmlitem.attribute( "text" ).as_string() );
+			const std::string& font = macros::parse( xmlitem.attribute( "font" ).as_string() );
+			const std::string& name = macros::parse( xmlitem.attribute( "name" ).as_string() );
+
+			MenuItemPointer item( nullptr );
+			item = menu->getItemByName( name );
+			if( !item )
+				item = menu->push( imageN, imageS, imageD, font, text, nullptr );
+			load( item, xmlitem, depth );
+		}
+		menu->align( menu->getAlignedColums() );
+	}
+	void load_nonscissor_children( ScrollMenu* node, pugi::xml_node xmlnode, int depth )
+	{
+		FOR_EACHXML_BYTAG( xmlnode, xmlchild, "node" )
+		{
+			auto child = getorbuild_node( node, xmlchild, depth );
+			assert( child );
+			if( !child ) continue;
+			load( child, xmlchild, depth );
+			if( child->getParent() != node )
+				node->addChildNotScissor( child, child->getLocalZOrder() );
+		}
+	}
+
+	IntrusivePtr<EventBase> load_event( const pugi::xml_node xmlnode )
 	{
 		const std::string& type = xmlnode.name();
 
@@ -124,144 +333,41 @@ namespace xmlLoader
 		}
 		for( auto child = xmlnode.first_child(); child; child = child.next_sibling() )
 		{
-			event->loadXmlEntity( child.name(), child );
+			auto name = child.name();
+			event->loadXmlEntity( name, child );
 		}
 		return event;
 	}
 
-	void load( Node* node, const std::string & path )
+	template <typename T> static T parseValue( const std::vector <std::string> &attrs, size_t index )
 	{
-		auto doc = getDoc( path );
-		load( node, doc->root().first_child() );
+		const std::string& value = attrs[index];
+		return strTo <T>( value );
 	}
 
-	void load( Node* node, const pugi::xml_node & xmlnode, bool ignoreTemplate )
+	template <typename T> static T parseOptionalValue(const std::vector <std::string> &attrs, size_t index, const T& defaultValue)
 	{
-		const std::string& template_ = xmlnode.attribute( ksTemplate.c_str() ).as_string();
-		if( ignoreTemplate == false && template_.empty() == false )
-		{
-			load( node, template_ );
-		}
-
-		for( auto attr = xmlnode.first_attribute(); attr; attr = attr.next_attribute() )
-		{
-			const std::string name = attr.name();
-			xmlLoader::setProperty( node, name, attr.value() );
-		}
-
-		for( auto xmlentity : xmlnode )
-		{
-			const std::string& tag = xmlentity.name();
-			bool result( false );
-			NodeExt * nodeext = dynamic_cast<NodeExt*>(node);
-			if( nodeext )
-			{
-				result = nodeext->loadXmlEntity( tag, xmlentity );
-			}
-			if( !result )
-			{
-				result = true;
-				if( tag == "children" )
-				{
-					auto paralax = dynamic_cast<ParallaxNode*>(node);
-					if( !paralax )
-						load_children( node, xmlentity );
-					else
-						load_paralax_children( paralax, xmlentity );
-				}
-				else if( tag == "items" )
-				{
-					ScrollMenu* scrollmenu = dynamic_cast<ScrollMenu*>(node);
-					assert( scrollmenu );
-					load_scrollmenu_items( scrollmenu, xmlentity );
-				}
-				else if( tag == "children_nonscissor" )
-				{
-					ScrollMenu* scrollmenu = dynamic_cast<ScrollMenu*>(node);
-					assert( scrollmenu );
-					if( scrollmenu )
-					{
-						load_nonscissor_children( scrollmenu, xmlentity );
-					}
-				}
-				else if( tag == "actions" )
-				{
-					NodeExt * nodeext = dynamic_cast<NodeExt*>(node);
-					assert( nodeext );
-					if( nodeext ) nodeext->loadActions( xmlentity );
-				}
-				else if( tag == "events" )
-				{
-					NodeExt * nodeext = dynamic_cast<NodeExt*>(node);
-					assert( nodeext );
-					if( nodeext ) nodeext->loadEvents( xmlentity );
-				}
-				else
-				{
-					result = false;
-				}
-				if( !result )
-				{
-					log_once( "xml node will not reading. path=[%s]", xmlentity.path().c_str() );
-				}
-			}
-
-		}
+		return index < attrs.size() ? parseValue <T>(attrs, index) : defaultValue;
 	}
 
-	NodePointer getorbuild_node( Node * node, const pugi::xml_node & xmlnode, bool& createdFromTemplate )
+	template <> bool parseValue( const std::vector <std::string> &attrs, size_t index )
 	{
-		const std::string& type = xmlnode.attribute( ksType.c_str() ).as_string();
-		const std::string& name = xmlnode.attribute( ksName.c_str() ).as_string();
-		const std::string& path = xmlnode.attribute( ksPath.c_str() ).as_string();
-		const std::string& template_ = xmlnode.attribute( ksTemplate.c_str() ).as_string();
-		NodePointer child( nullptr );
-		if( template_.empty() == false )
-		{
-			child = load_node( macros::parse( template_ ) );
-			if( child )
-				createdFromTemplate = true;
-		}
-		if( child == nullptr && path.empty() == false )
-		{
-			child = getNodeByPath( node, path );
-		}
-		if( child == nullptr && name.empty() == false )
-		{
-			child = node->getChildByName( name );
-		}
-		if( child == nullptr )
-		{
-			if( type.empty() )
-			{
-				log( "xmlLoader (getorbuild_node): empty type. xml node path: [%s]", xmlnode.path().c_str() );
-			}
-			child = Factory::shared().build<Node>( type );
-		}
-		return child;
+		const std::string& value = attrs[index];
+		return strTo<bool>(value);
 	}
 
-	void load_children( Node* node, const pugi::xml_node & xmlnode )
+
+	ActionPointer load_action_from_file( const std::string & path )
 	{
-		FOR_EACHXML_BYTAG( xmlnode, xmlchild, "node" )
-		{
-			bool createdFromTemplate( false );
-			auto child = getorbuild_node( node, xmlchild, createdFromTemplate );
-			if( !child )
-				continue;
-			assert( child );
-			if( child == nullptr )
-				continue;
-			load( child, xmlchild, createdFromTemplate );
-			if( child->getParent() == nullptr )
-			{
-				node->addChild( child, child->getLocalZOrder() );
-			}
-		}
+		pugi::xml_document doc;
+		doc.load_file( path.c_str() );
+		auto root = doc.root().first_child();
+		return load_action( root );
 	}
 
 	ActionPointer load_action( const std::string & desc )
 	{
+
 		auto remove_spaces = []( const std::string & desc )
 		{
 			std::string result = desc;
@@ -276,19 +382,19 @@ namespace xmlLoader
 		auto getType = []( const std::string & desc )
 		{
 			std::string type;
-			size_t k = desc.find( "[" );
-			if( k != std::string::npos )
+			auto k = desc.find( "[" );
+            if( k != std::string::npos )
 				type = desc.substr( 0, k );
 			return type;
 		};
 		auto getParams = []( const std::string & desc )
 		{
 			std::string params;
-			size_t k = desc.find( "[" );
+			auto k = desc.find( "[" );
 			if( k != std::string::npos )
 			{
 				int count( 1 );
-				size_t l = k + 1;
+				int l = k + 1;
 				for( ; l < (int)desc.size() && count != 0; ++l )
 				{
 					if( desc[l] == '[' )++count;
@@ -302,7 +408,7 @@ namespace xmlLoader
 		{
 			std::vector<std::string> attr;
 			int count = 0;
-			size_t l = 0;
+			int l = 0;
 			for( unsigned r = 0; r < params.size(); ++r )
 			{
 				if( params[r] == '[' )++count;
@@ -321,10 +427,10 @@ namespace xmlLoader
 			auto _folder = []( std::string & string )
 			{
 				std::string result;
-				size_t k = string.find( "folder:" );
+				auto k = string.find( "folder:" );
 				if( k == 0 || k == 1 )
 				{
-					size_t l = 0;
+					unsigned l = 0;
 					for( l = 0; l < string.size(); ++l )
 					{
 						if( string[k + l] == ',' )
@@ -335,13 +441,13 @@ namespace xmlLoader
 				}
 				return result;
 			};
-			auto _frames = []( std::string & string )
+			auto _frames = []( std::string & string, const std::string& folder )
 			{
-				auto _list = [string]()mutable
+				auto _list = [string, folder]()mutable
 				{
 					std::list<std::string> list;
 					std::vector<std::string> frames;
-					size_t k = string.find( "frames:" );
+					auto k = string.find( "frames:" );
 					if( k == 0 || k == 1 )
 					{
 						string = string.substr( k + 7 );
@@ -351,16 +457,16 @@ namespace xmlLoader
 					split( list, string );
 					for( auto & frame : list )
 					{
-						frames.push_back( frame );
+						frames.push_back( folder + frame );
 					}
 					return frames;
 				};
-				auto _indexes = [string]()mutable
+				auto _indexes = [string, folder]()mutable
 				{
 					std::string _indexes( "indexes:" );
 					std::list<std::string> list;
 					std::vector<std::string> frames;
-					int k = string.find( _indexes );
+					auto k = string.find( _indexes );
 					if( k == 0 || k == 1 )
 						string = string.substr( k + _indexes.size() );
 					if( string.back() == ']' )
@@ -383,7 +489,7 @@ namespace xmlLoader
 						auto k = string.find( ":" );
 						if( k == std::string::npos )
 						{
-							int index = strToInt( string );
+							int index = strTo<int>( string );
 							indexes.push_back( index );
 
 							if( indexformat.size() < string.size() )
@@ -395,8 +501,8 @@ namespace xmlLoader
 							std::string b = string.substr( k + 1 );
 							if( indexformat.size() < a.size() ) indexformat = a;
 							if( indexformat.size() < b.size() ) indexformat = b;
-							int l = strToInt( a );
-							int r = strToInt( b );
+							int l = strTo<int>( a );
+							int r = strTo<int>( b );
 							for( int i = l; i != r; (r > l ? ++i : --i) )
 							{
 								indexes.push_back( i );
@@ -406,13 +512,28 @@ namespace xmlLoader
 						list.pop_front();
 					}
 
-					std::string format( "%0" + toStr( indexformat.size() ) + "d" );
+					std::string format( "%0" + toStr( (int)indexformat.size() ) + "d" );
 					for( auto i : indexes )
 					{
 						char buffer[8];
 						sprintf( buffer, format.c_str(), i );
 						std::string frameext = frame + buffer + ext;
-						frames.push_back( frameext );
+						std::string name = folder + frameext;
+						auto frame = ImageManager::shared().spriteFrame( name );
+						if( frame )
+							frames.push_back( name );
+#if EDITOR == 1
+						else if( FileUtils::getInstance()->isFileExist( name ) )
+						{
+							auto sprite = ImageManager::shared().sprite( name );
+							if( sprite )
+							{
+								SpriteFrame* frame = SpriteFrame::create( name, Rect( 0, 0, sprite->getContentSize().width, sprite->getContentSize().height ) );
+								if( frame )
+									frames.push_back( name );
+							}
+						}
+#endif
 					}
 
 					return frames;
@@ -424,13 +545,26 @@ namespace xmlLoader
 				assert( 0 );
 				return std::vector<std::string>();
 			};
+
+			static std::map<std::string, Animation*> _cash;
+#ifndef _DEBUG
+			auto iter = _cash.find( value );
+			if( iter != _cash.end() )
+				return iter->second->clone();
+#endif
+
 			auto str = value;
 			auto folder = _folder( str );
-			auto frames = _frames( str );
-			for( auto & frame : frames )
-				frame = folder + frame;
+			auto frames = _frames( str, folder );
 
-			return createAnimation( frames, duration );
+			auto animation = createAnimation( frames, duration );
+			if( animation )
+			{
+				animation->retain();
+				_cash[value] = animation;
+				animation = animation->clone();
+			}
+			return animation;
 		};
 
 		const std::string& cleared_desc = macros::parse( remove_spaces( desc ) );
@@ -438,47 +572,14 @@ namespace xmlLoader
 		const std::string& params = getParams( cleared_desc );
 		const std::vector<std::string>& attr = getAttrs( params );
 
-		auto FLOAT = [attr]( int index )
-		{
-			const std::string& value = attr[index];
-			std::string::size_type k = value.find( ".." );
-			if( k == std::string::npos )
-			{
-				return strToFloat( value );
-			}
-			else
-			{
-				const float l = strToFloat( value.substr( 0, k ) );
-				const float r = strToFloat( value.substr( k + 2 ) );
-				const float v = CCRANDOM_0_1() * (r - l) + l;
-				assert( l <= r );
-				assert( v >= l && v <= r );
-				return v;
-			}
-		};
-		auto INT = [attr]( int index )
-		{
-			const std::string& value = attr[index];
-			std::string::size_type k = value.find( ".." );
-			if( k == std::string::npos )
-			{
-				return strToInt( value );
-			}
-			else
-			{
-				const int l = strToFloat( value.substr( 0, k ) );
-				const int r = strToFloat( value.substr( k + 2 ) );
-				const int v = static_cast<int>(CCRANDOM_0_1() * (r - l) + l);
-				assert( l <= r );
-				assert( v >= l && v <= r );
-				return v;
-			}
-		};
-		auto BOOL = [attr]( int index )
-		{
-			const std::string& value = attr[index];
-			return strToBool( value );
-		};
+		auto FLOAT = [&attr] (int index) { return parseValue <float>(attr, index); };
+		auto INT = [&attr] (int index) { return parseValue <int>(attr, index); };
+		auto BOOL = [&attr] (int index) { return parseValue <bool>(attr, index); };
+
+		auto OPTIONAL_FLOAT = [&attr]( size_t index, float defaultValue ) { return parseOptionalValue <float>( attr, index, defaultValue ); };
+		auto OPTIONAL_INT = [&attr]( size_t index, int defaultValue ) { return parseOptionalValue <int>( attr, index, defaultValue ); };
+		auto OPTIONAL_BOOL = [&attr]( size_t index, bool defaultValue ) { return parseOptionalValue <bool>( attr, index, defaultValue ); };
+		auto OPTIONAL_STRING = [&attr]( size_t index ) { return index < attr.size() ? attr[index] : ""; };
 
 		auto action_interval = []( const std::string & desc ) { return static_cast<ActionInterval*>(load_action( desc ).ptr()); };
 		//auto action_finitetime = []( const std::string & desc ) { return static_cast<FiniteTimeAction*>(load_action( desc ).ptr()); };
@@ -491,7 +592,6 @@ namespace xmlLoader
 			{
 				auto action = load_action( saction );
 				auto fta = dynamic_cast<FiniteTimeAction*>(action.ptr());
-				assert( fta );
 				if( fta )
 					actions.pushBack( fta );
 			}
@@ -533,88 +633,36 @@ namespace xmlLoader
 		else if( type == k::ActionSineIn ) { return EaseSineIn::create( action_interval( attr[0] ) ); }
 		else if( type == k::ActionSineOut ) { return EaseSineOut::create( action_interval( attr[0] ) ); }
 		else if( type == k::ActionSineInOut ) { return EaseSineInOut::create( action_interval( attr[0] ) ); }
-		else if( type == k::ActionAnimate ) 
-		{ 
-			auto animation = buildAnimation( FLOAT( 0 ), attr[1] );
-			return animation ? Animate::create( animation ) : nullptr;
+		else if( type == k::ActionAnimate ) { return Animate::create( buildAnimation( FLOAT( 0 ), attr[1] ) ); }
+		else if( type == k::ActionBezier ) {
+			EaseBezierAction * bezier = EaseBezierAction::create( action_interval( attr[0] ) );
+			bezier->setBezierParamer( FLOAT( 1 ), FLOAT( 2 ), FLOAT( 3 ), FLOAT( 4 ) );
+			return bezier;
 		}
 
 		//action instant
 		else if( type == k::ActionRemoveSelf ) { return RemoveSelf::create(); }
 		else if( type == k::ActionShow ) { return Show::create(); }
 		else if( type == k::ActionHide ) { return Hide::create(); }
-		else if( type == k::ActionEnable ) { return ActionEnable::create(); }
-		else if( type == k::ActionDisable ) { return ActionDisable::create(); }
 		else
 		{
+#if USE_CHEATS == 1
 			std::string message = "undefinited action type [" + type + "] \n";
 			message += "action string: \n";
 			message += cleared_desc;
 			log_once( "%s", message.c_str() );
+			MessageBox( message.c_str(), "Error creating action" );
 			assert( 0 );
+#endif
 		}
 
 		return nullptr;
 	}
 
-	ActionPointer load_action_from_file( const std::string& path )
-	{
-		auto doc = getDoc( path );
-		return load_action( doc->root().first_child() );
-	}
-
-	ActionPointer load_action( const pugi::xml_node & xmlnode )
+	ActionPointer load_action( const pugi::xml_node xmlnode )
 	{
 		auto body = xmlnode.attribute( "value" ).as_string();
 		return load_action( body );
-	}
-
-	void load_scrollmenu_items( ScrollMenu* menu, const pugi::xml_node & xmlnode )
-	{
-		for( auto xmlitem : xmlnode )
-		{
-			const std::string& imageN = macros::parse( xmlitem.attribute( "imageN" ).as_string() );
-			const std::string& imageS = macros::parse( xmlitem.attribute( "imageS" ).as_string() );
-			const std::string& imageD = macros::parse( xmlitem.attribute( "imageD" ).as_string() );
-			const std::string& text = macros::parse( xmlitem.attribute( "text" ).as_string() );
-			const std::string& font = macros::parse( xmlitem.attribute( "font" ).as_string() );
-
-			MenuItemPointer item( nullptr );
-			item = menu->getItemByName( xmlitem.attribute( "name" ).as_string() );
-			if( !item )
-				item = menu->push( imageN, imageS, imageD, font, text, nullptr );
-			load( item, xmlitem );
-		}
-		menu->align( menu->getAlignedColums() );
-	}
-	void load_nonscissor_children( ScrollMenu* node, const pugi::xml_node & xmlnode )
-	{
-		FOR_EACHXML_BYTAG( xmlnode, xmlchild, "node" )
-		{
-			bool createdFromTemplate(false);
-			auto child = getorbuild_node( node, xmlchild, createdFromTemplate );
-			if( !child ) 
-				continue;
-			load( child, xmlchild, createdFromTemplate );
-			if( child->getParent() != node )
-				node->addChildNotScissor( child, child->getLocalZOrder() );
-		}
-	}
-	void load_paralax_children( ParallaxNode* node, const pugi::xml_node & xmlnode )
-	{
-		for( auto xmlchild : xmlnode )
-		{
-			auto ratio = strToPoint( xmlchild.attribute( "ratio" ).as_string() );
-			auto offset = strToPoint( xmlchild.attribute( "offset" ).as_string() );
-			bool createdFromTemplate( false );
-			auto child = getorbuild_node( node, xmlchild, createdFromTemplate );
-			if( !child )
-				continue;
-			load( child, xmlchild, createdFromTemplate );
-			if( child->getParent() )
-				child->removeFromParent();
-			node->addChild( child, child->getLocalZOrder(), ratio, offset );
-		}
 	}
 
 	namespace macros
@@ -672,58 +720,25 @@ namespace xmlLoader
 
 	}
 
-	void load( ParamCollection * params, const std::string & path )
+	void load_paramcollection( ParamCollection& params, const std::string & path )
 	{
-		assert( params );
-		auto doc = getDoc( path );
-		auto root = doc->root().first_child();
-		for( auto child : root )
+		pugi::xml_document doc;
+		doc.load_file( path.c_str() );
+		auto root = doc.root().first_child();
+		load_paramcollection( params, root );
+	}
+	void load_paramcollection( ParamCollection& params, const pugi::xml_node xmlnode )
+	{
+		for( auto child : xmlnode )
 		{
 			std::string name = child.attribute( "name" ).as_string();
 			std::string value = child.attribute( "value" ).as_string();
-			(*params)[name] = value;
+			if( name.empty() )
+				name = child.name();
+			if( value.empty() )
+				value = child.text().as_string();
+			params[name] = macros::parse(value);
 		}
-	}
-
-
-	typedef int8_t SaveTypeCode;
-	typedef int32_t SaveTypeSize;
-	typedef uint8_t SaveTypeString;
-
-	const SaveTypeCode kCode1( 1 );
-	const SaveTypeCode kCode2( 2 );
-	const SaveTypeCode kCode3( 3 );
-	const SaveTypeCode kCode4( 4 );
-	const SaveTypeCode kCodeMax( 4 );
-
-	SaveTypeString encode1( SaveTypeString c ) { return c * 2 + 1; }
-	SaveTypeString encode2( SaveTypeString c ) { return c * 2 + 2; }
-	SaveTypeString encode3( SaveTypeString c ) { return c * 2 - 1; }
-	SaveTypeString encode4( SaveTypeString c ) { return c * 2 - 2; }
-
-	SaveTypeString decode1( SaveTypeString c ) { return (c - 1) / 2; }
-	SaveTypeString decode2( SaveTypeString c ) { return (c - 2) / 2; }
-	SaveTypeString decode3( SaveTypeString c ) { return (c + 1) / 2; }
-	SaveTypeString decode4( SaveTypeString c ) { return (c + 2) / 2; }
-
-	SaveTypeString encode( SaveTypeCode code, SaveTypeString c )
-	{
-		if( code == kCode1 ) return encode1( c );
-		if( code == kCode2 ) return encode2( c );
-		if( code == kCode3 ) return encode3( c );
-		if( code == kCode4 ) return encode4( c );
-		if( code > kCodeMax ) return c;
-		return c;
-	}
-
-	SaveTypeString decode( SaveTypeCode code, SaveTypeString c )
-	{
-		if( code == kCode1 ) return decode1( c );
-		if( code == kCode2 ) return decode2( c );
-		if( code == kCode3 ) return decode3( c );
-		if( code == kCode4 ) return decode4( c );
-		if( code > kCodeMax ) return c;
-		return c;
 	}
 };
 
