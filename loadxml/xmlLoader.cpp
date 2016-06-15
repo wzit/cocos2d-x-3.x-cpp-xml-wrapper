@@ -80,7 +80,7 @@ namespace xmlLoader
 	{
 		auto doc = getDoc( file );
 		auto root = doc->root().first_child();
-		NodePointer result = load_node( root, topType, depth );
+		NodePointer result = root ? load_node( root, topType, depth ) : nullptr;
 		return result;
 	}
 
@@ -521,8 +521,9 @@ namespace xmlLoader
 						std::string name = folder + frameext;
 						auto frame = ImageManager::shared().spriteFrame( name );
 						if( frame )
+						{
 							frames.push_back( name );
-#if EDITOR == 1
+						}
 						else if( FileUtils::getInstance()->isFileExist( name ) )
 						{
 							auto sprite = ImageManager::shared().sprite( name );
@@ -533,7 +534,6 @@ namespace xmlLoader
 									frames.push_back( name );
 							}
 						}
-#endif
 					}
 
 					return frames;
