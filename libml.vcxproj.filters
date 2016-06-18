@@ -157,6 +157,7 @@
     <ClCompile Include="ShadersCache.cpp" />
     <ClCompile Include="LayerBlur.cpp" />
     <ClCompile Include="Generics.cpp" />
+    <ClCompile Include="ScoreCounter.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Audio\AudioEngine.h">
@@ -259,5 +260,6 @@
     <ClInclude Include="ShadersCache.h" />
     <ClInclude Include="LayerBlur.h" />
     <ClInclude Include="Generics.h" />
+    <ClInclude Include="ScoreCounter.h" />
   </ItemGroup>
 </Project>

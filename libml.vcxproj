@@ -139,6 +139,7 @@
     <ClCompile Include="DataBase.cpp" />
     <ClCompile Include="Generics.cpp" />
     <ClCompile Include="LayerBlur.cpp" />
+    <ClCompile Include="ScoreCounter.cpp" />
     <ClCompile Include="services\adcolony\adcolony_dummy.cpp" />
     <ClCompile Include="services\admob\AdMob.cpp" />
     <ClCompile Include="services\Advertisers.cpp" />
@@ -192,6 +193,7 @@
     <ClInclude Include="DataBase.h" />
     <ClInclude Include="Generics.h" />
     <ClInclude Include="LayerBlur.h" />
+    <ClInclude Include="ScoreCounter.h" />
     <ClInclude Include="services\adcolony\adcolony.h" />
     <ClInclude Include="services\admob\AdMob.h" />
     <ClInclude Include="services\Advertisers.h" />

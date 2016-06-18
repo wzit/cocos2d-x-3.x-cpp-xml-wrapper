@@ -96,6 +96,7 @@ void NodeExt::load( const pugi::xml_node & root )
 	xmlLoader::bookDirectory( this );
 	xmlLoader::load( as_node_pointer(), root );
 	xmlLoader::unbookDirectory(this);
+	onLoaded();
 }
 
 void NodeExt::onLoaded()

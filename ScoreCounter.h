@@ -3,7 +3,7 @@
  * Copyright 2014-2015 Vladimir Tolmachev
  *
  * Author: Vladimir Tolmachev
- * Project: Defense of Greece
+ * Project: ml
  * e-mail: tolm_vl@hotmail.com
  * If you received the code is not the author, please contact me
  */
@@ -12,9 +12,9 @@
 #ifndef __SCORE_COUNTER__
 #define __SCORE_COUNTER__
 
-#include "ml/Observer.h"
-#include "ml/Singlton.h"
-#include "ml/xtea/xtea.h"
+#include "Observer.h"
+#include "Singlton.h"
+#include "xtea/xtea.h"
 
 NS_CC_BEGIN;
 

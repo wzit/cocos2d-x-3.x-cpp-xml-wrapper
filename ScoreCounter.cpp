@@ -3,7 +3,7 @@
  * Copyright 2014-2015 Vladimir Tolmachev
  *
  * Author: Vladimir Tolmachev
- * Project: Defense of Greece
+ * Project: ml
  * e-mail: tolm_vl@hotmail.com
  * If you received the code is not the author, please contact me
  */
@@ -11,8 +11,8 @@
 
 #include <ctime>
 #include "ScoreCounter.h"
-#include "ml/mlUserData.h"
-#include "ml/loadxml/Crypto.h"
+#include "mlUserData.h"
+#include "loadxml/Crypto.h"
 
 NS_CC_BEGIN;
 
