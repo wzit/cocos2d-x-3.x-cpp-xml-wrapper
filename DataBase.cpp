@@ -3,72 +3,87 @@
 #include "loadxml/xmlLoader.h"
 NS_CC_BEGIN
 
-size_t DataBase::max( const std::string& group, const std::string& param )const
+size_t DataBase::max( const std::string& table, const std::string& row )const
 {
-	_checkAndLog( group, param, 0 );
-	int a = id( group );
-	int b = id( param );
+	_checkAndLog( table, row, 0 );
+	int a = id( table );
+	int b = id( row );
 	return _raw.at( a ).at( b ).size();
 }
 
-bool DataBase::isExist( const std::string& group )const
+bool DataBase::isExist( const std::string& table )const
 {
-	if( _ids.find( group ) == _ids.end() ) return false;
-	auto iGroup = _raw.find( id( group ) );
-	if( iGroup == _raw.end() )return false;
+	if( _ids.find( table ) == _ids.end() ) return false;
+	auto iTable = _raw.find( id( table ) );
+	if( iTable == _raw.end() )return false;
 	return true;
 }
 
-bool DataBase::isExist( const std::string& group, const std::string& param )const
+bool DataBase::isExist( const std::string& table, const std::string& row )const
 {
-	if( _ids.find( group ) == _ids.end() ) return false;
-	if( _ids.find( param ) == _ids.end() ) return false;
-	auto iGroup = _raw.find( id( group ) );
-	if( iGroup == _raw.end() )return false;
-	auto iParam = iGroup->second.find( id( param ) );
-	if( iParam == iGroup->second.end() )return false;
+	if( _ids.find( table ) == _ids.end() ) return false;
+	if( _ids.find( row ) == _ids.end() ) return false;
+	auto iTable = _raw.find( id( table ) );
+	if( iTable == _raw.end() )return false;
+	auto iRow = iTable->second.find( id( row ) );
+	if( iRow == iTable->second.end() )return false;
 	return true;
 }
 
-bool DataBase::isExist( const std::string& group, const std::string& param, unsigned index )const
+bool DataBase::isExist( const std::string& table, const std::string& row, unsigned index )const
 {
-	if( _ids.find( group ) == _ids.end() ) return false;
-	if( _ids.find( param ) == _ids.end() ) return false;
-	auto iGroup = _raw.find( id( group ) );
-	if( iGroup == _raw.end() )return false;
-	auto iParam = iGroup->second.find( id( param ) );
-	if( iParam == iGroup->second.end() )return false;
-	return index < iParam->second.size();
+	if( _ids.find( table ) == _ids.end() ) return false;
+	if( _ids.find( row ) == _ids.end() ) return false;
+	auto iTable = _raw.find( id( table ) );
+	if( iTable == _raw.end() )return false;
+	auto iRow = iTable->second.find( id( row ) );
+	if( iRow == iTable->second.end() )return false;
+	return index < iRow->second.size();
 }
 
-template <> bool DataBase::get( const std::string& group, const std::string& param, unsigned index )const
+int DataBase::getIndex( const std::string& table, const std::string& row, const std::string& parameter )const
 {
-	_checkAndLog( group, param, index );
-	return strToBool( _raw.at( id( group ) ).at( id( param ) ).at( index ) );
+	_checkAndLog( table, row, 0 );
+	auto iTable = _raw.find( id( table ) );
+	auto iRow = iTable->second.find( id( row ) );
+	int index( 0 );
+	for( auto& value : iRow->second )
+	{
+		if( value == parameter )
+			break;
+		++index;
+	}
+	return index;
 }
 
-template <> int32_t DataBase::get( const std::string& group, const std::string& param, unsigned index )const
+template <> bool DataBase::get( const std::string& table, const std::string& row, unsigned index )const
 {
-	_checkAndLog( group, param, index );
-	return strTo<int32_t>( _raw.at( id( group ) ).at( id( param ) ).at( index ) );
+	_checkAndLog( table, row, index );
+	return strTo<bool>( _raw.at( id( table ) ).at( id( row ) ).at( index ) );
 }
 
-template <> uint32_t DataBase::get( const std::string& group, const std::string& param, unsigned index )const
+template <> int32_t DataBase::get( const std::string& table, const std::string& row, unsigned index )const
 {
-	_checkAndLog( group, param, index );
-	return strTo<uint32_t>( _raw.at( id( group ) ).at( id( param ) ).at( index ) );
+	_checkAndLog( table, row, index );
+	return strTo<int32_t>( _raw.at( id( table ) ).at( id( row ) ).at( index ) );
 }
 
-template <> float DataBase::get( const std::string& group, const std::string& param, unsigned index )const
+template <> uint32_t DataBase::get( const std::string& table, const std::string& row, unsigned index )const
 {
-	_checkAndLog( group, param, index );
-	return _base.at( id( group ) ).at( id( param ) ).at( index );
+	_checkAndLog( table, row, index );
+	return strTo<uint32_t>( _raw.at( id( table ) ).at( id( row ) ).at( index ) );
 }
 
-template <> std::string DataBase::get( const std::string& group, const std::string& param, unsigned index )const
+template <> float DataBase::get( const std::string& table, const std::string& row, unsigned index )const
 {
-	_checkAndLog( group, param, index );
-	return _raw.at( id( group ) ).at( id( param ) ).at( index );
+	_checkAndLog( table, row, index );
+	return _base.at( id( table ) ).at( id( row ) ).at( index );
+}
+
+template <> std::string DataBase::get( const std::string& table, const std::string& row, unsigned index )const
+{
+	_checkAndLog( table, row, index );
+	return _raw.at( id( table ) ).at( id( row ) ).at( index );
 }
 
 int DataBase::id( const std::string& value, bool create )const
@@ -84,15 +99,15 @@ int DataBase::id( const std::string& value )const
 	return _ids.at( value );
 }
 
-void DataBase::_checkAndLog( const std::string& group, const std::string& param, unsigned index )const
+void DataBase::_checkAndLog( const std::string& table, const std::string& row, unsigned index )const
 {
 #ifdef _DEBUG
-	if( isExist( group, param, index ) == false )
+	if( isExist( table, row, index ) == false )
 	{
 		log( "==================================" );
-		log( "group [%s] is %s", group.c_str(), isExist( group ) ? "exist" : "not exist" );
-		log( "group [%s] is %s", (group + "/" + param).c_str(), isExist( group, param ) ? "exist" : "not exist" );
-		log( "group [%s] is %s", (group + "/" + param + "/" + toStr( index )).c_str(), isExist( group, param, index ) ? "exist" : "not exist" );
+		log( "table [%s] is %s", table.c_str(), isExist( table ) ? "exist" : "not exist" );
+		log( "table [%s] is %s", (table + "/" + row).c_str(), isExist( table, row ) ? "exist" : "not exist" );
+		log( "table [%s] is %s", (table + "/" + row + "/" + toStr( index )).c_str(), isExist( table, row, index ) ? "exist" : "not exist" );
 		log( "==================================" );
 	}
 #endif
@@ -102,15 +117,15 @@ void DataBase::onCreate()
 {
 	auto doc = xmlLoader::getDoc( "ini/database.xml" );
 	auto root = doc->root().first_child();
-	for( auto xmlgroup = root.first_child(); xmlgroup; xmlgroup = xmlgroup.next_sibling() )
+	for( auto xmltable = root.first_child(); xmltable; xmltable = xmltable.next_sibling() )
 	{
-		std::string sgroup = xmlgroup.name();
-		auto group = id( sgroup, true );
-		for( auto xmlparam = xmlgroup.first_child(); xmlparam; xmlparam = xmlparam.next_sibling() )
+		std::string stable = xmltable.name();
+		auto table = id( stable, true );
+		for( auto xmlrow = xmltable.first_child(); xmlrow; xmlrow = xmlrow.next_sibling() )
 		{
-			std::string sparam = xmlparam.name();
-			auto param = id( sparam, true );
-			std::string text = xmlparam.text().get();
+			std::string srow = xmlrow.name();
+			auto row = id( srow, true );
+			std::string text = xmlrow.text().get();
 			int k( 0 );
 			while( (k = text.find( "," )) != std::string::npos )
 				text[k] = '.';
@@ -118,9 +133,9 @@ void DataBase::onCreate()
 			split( svalues, text, ' ' );
 			for( auto value : svalues )
 			{
-				float v = strToFloat( value );
-				_raw[group][param].push_back( value );
-				_base[group][param].push_back( v );
+				float v = strTo<float>( value );
+				_raw[table][row].push_back( value );
+				_base[table][row].push_back( v );
 			}
 		}
 	}
