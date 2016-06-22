@@ -351,6 +351,12 @@ void appendToFile( const std::string & pathToCryptoFile, const std::string & afi
 
 XmlDocPointer loadDoc( const std::string& datFile_, const std::string& file )
 {
+	{
+		auto doc = std::make_shared<pugi::xml_document>();
+		doc->load_file( file.c_str() );
+		return doc;
+	}
+	//
 	auto doc = std::make_shared<pugi::xml_document>();
 
 	std::string datFile;
