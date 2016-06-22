@@ -18,14 +18,15 @@ class Singlton
 public:
 	static T& shared()
 	{
-		static T instance;
+		static T* instance;
 		static bool firstrun( true );
 		if( firstrun )
 		{
 			firstrun = false;
-			instance.onCreate();
+			instance = new T();
+			instance->onCreate();
 		}
-		return instance;
+		return *instance;
 	}
 	virtual void onCreate() {}
 };
