@@ -345,7 +345,7 @@ void Machine::push_event( const Tag& event )
 {
 	Event * eventPtr =&this->event( event );
 	_eventsQueue.push( eventPtr );
-	process();
+	//process();
 }
 
 bool Machine::_isvalid( const EventsCIterator& iterator )const
@@ -409,10 +409,11 @@ StatesCIterator Machine::_state( Tag name )const
 void Machine::_set_state( State * state )
 {
 	assert( state );
-	if( _currentState )
-		_currentState->onDeactivate();
+	auto prev = _currentState;
 	_currentState = state;
-	_currentState->onActivate();
+	if( prev )
+		prev->onDeactivate();
+	state->onActivate();
 }
 
 FSM_END
