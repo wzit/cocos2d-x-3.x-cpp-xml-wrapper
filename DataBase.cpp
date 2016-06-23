@@ -130,7 +130,11 @@ void DataBase::onCreate()
 			while( (k = text.find( "," )) != std::string::npos )
 				text[k] = '.';
 			std::vector<std::string> svalues;
-			split( svalues, text, ' ' );
+			char divider( ' ' );
+			if( text.find( "\t" ) != std::string::npos )
+				divider = '\t';
+			split( svalues, text, divider );
+
 			for( auto value : svalues )
 			{
 				float v = strTo<float>( value );
