@@ -158,6 +158,7 @@ T * getNodeByPath( cocos2d::Node * root, const std::string & path_names )
 
 void openUrl( const std::string & url );
 void openStoreUrl();
+float calculate( const std::string& expression, const std::map<std::string, float>& constants );
 
 class ActionEnable : public cocos2d::ActionInstant
 {

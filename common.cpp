@@ -894,3 +894,56 @@ EventKeyboard::KeyCode strToKeyCode( const std::string & value )
 	assert( 0 );
 	return EventKeyboard::KeyCode::KEY_NONE;
 }
+
+float calculate( const std::string& expression, const std::map<std::string, float>& constants, const std::string& operators )
+{
+	if( expression.empty() )
+		return 0;
+	std::string s = expression;
+	std::vector<std::string> args;
+	std::vector<char> ops = { '+' };
+	int k = s.find_first_of( operators );
+	while( k != std::string::npos )
+	{
+		args.push_back( s.substr( 0, k ) );
+		ops.push_back( s[k] );
+		s = s.substr( k + 1 );
+		k = s.find_first_of( operators );
+	}
+	args.push_back( s );
+
+	auto value = [constants]( const std::string& arg )
+	{
+		if( constants.count( arg ) > 0 )
+			return constants.at( arg );
+		if( arg.empty() )
+			return 0.f;
+		if( arg.back() == '%' )
+			return strTo<float>( arg.substr( 0, arg.size() - 1 ) ) / 100.f;
+		return strTo<float>( arg );
+	};
+	if( args.size() == 1 )
+	{
+		return args.front().find_first_of( "+-*=" ) == -1 ?
+			value( args.front() ) :
+			calculate( args.front(), constants, "*/" );
+	}
+
+	float result = 0.f;
+	int index( 0 );
+	for( auto a : args )
+	{
+		float r = calculate( a, constants, "/*" );
+		if( ops[index] == '+' ) result += r;
+		if( ops[index] == '-' ) result -= r;
+		if( ops[index] == '*' ) result *= r;
+		if( ops[index] == '/' ) result /= r;
+		++index;
+	}
+	return result;
+}
+
+float calculate( const std::string& expression, const std::map<std::string, float>& constants )
+{
+	return calculate( expression, constants, "+-" );
+}
