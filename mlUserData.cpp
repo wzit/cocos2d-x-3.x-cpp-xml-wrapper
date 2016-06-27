@@ -86,7 +86,10 @@ namespace __userdata
 		if( Doc == nullptr )
 		{
 			//if( FileUtils::getInstance()->isFileExist( kFileDat ) )
-			Doc = ::loadDoc( kFileDat, kFile );
+			auto dir = kFileDat;
+			auto k = dir.find_last_of( "/" );
+			dir = dir.substr( 0, k );
+			Doc = ::loadDoc( /*kFileDat*/"", dir+ "/" + kFile );
 			if( validateDoc() == false )
 			{
 				Doc.reset( new pugi::xml_document );
@@ -118,7 +121,7 @@ namespace __userdata
 		auto k = dir.find_last_of( "/" );
 		dir = dir.substr( 0, k );
 		FileUtils::getInstance()->createDirectory(dir);
-		::saveDoc( kFileDat, kFile, Doc, false );
+		::saveDoc( /*kFileDat*/"", dir + "/" + kFile, Doc, false );
 #ifdef WIN32
 #if DEV == 1
 		auto path = FileUtils::getInstance()->getWritablePath() + kFile;

@@ -11,6 +11,23 @@ size_t DataBase::max( const std::string& table, const std::string& row )const
 	return _raw.at( a ).at( b ).size();
 }
 
+std::set<std::string> DataBase::getRows( const std::string& table )const
+{
+	std::set<std::string> result;
+	if( !isExist( table ) )
+		return result;
+	for( auto pair : _raw.at( id( table ) ) )
+	{
+		auto id = pair.first;
+		for( auto pairId : _ids )
+		{
+			if( pairId.second == id )
+				result.insert( pairId.first );
+		}
+	}
+	return result;
+}
+
 bool DataBase::isExist( const std::string& table )const
 {
 	if( _ids.find( table ) == _ids.end() ) return false;

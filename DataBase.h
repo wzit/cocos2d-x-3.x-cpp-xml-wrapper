@@ -10,7 +10,8 @@ class DataBase : public Singlton<DataBase>
 {
 public:
 	void onCreate();
-	size_t max( const std::string& group, const std::string& param )const;
+	size_t max( const std::string& table, const std::string& row )const;
+	std::set<std::string> getRows( const std::string& table )const;
 
 	bool isExist( const std::string& table )const;
 	bool isExist( const std::string& table, const std::string& row )const;
