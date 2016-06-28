@@ -204,6 +204,7 @@ const std::string& Event::get_string_name()const
 
 Machine::Machine()
 : _currentState( nullptr )
+, _previousState( nullptr )
 , _states()
 , _events()
 , _mutexQueueEvents()
@@ -317,6 +318,11 @@ State& Machine::state( const std::string& name )
 	return dummy;
 }
 
+State* Machine::previous_state()
+{
+	return _previousState;
+}
+
 State& Machine::current_state()
 {
 	return *_currentState;
@@ -409,10 +415,10 @@ StatesCIterator Machine::_state( Tag name )const
 void Machine::_set_state( State * state )
 {
 	assert( state );
-	auto prev = _currentState;
+	_previousState = _currentState;
 	_currentState = state;
-	if( prev )
-		prev->onDeactivate();
+	if( _previousState )
+		_previousState->onDeactivate();
 	state->onActivate();
 }
 

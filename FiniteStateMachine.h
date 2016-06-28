@@ -146,9 +146,10 @@ namespace FiniteState
 			return *((T*)(*i));
 		}
 
+		State* previous_state();
 		State& current_state();
 		void process();
-		void push_event( const Tag& event );
+		virtual void push_event( const Tag& event );
 
 	protected:
 		bool _isvalid( const EventsCIterator& iterator )const;
@@ -161,6 +162,7 @@ namespace FiniteState
 
 	protected:
 		State * _currentState;
+		State * _previousState;
 		StatesList _states;
 		EventsList _events;
 		std::mutex _mutexQueueEvents;
