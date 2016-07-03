@@ -10,7 +10,7 @@
 /******************************************************************************/
 
 #include "Events.h"
-#include "ObjectFactory.h"
+#include "mlObjectFactory.h"
 #include "common.h"
 #include "common.h"
 #include "NodeExt.h"
@@ -23,7 +23,7 @@ NS_CC_BEGIN;
 
 EventBase::Pointer EventBase::create( const std::string & type )
 {
-	return Factory::shared().build<EventBase>( type );
+	return mlObjectFactory::shared().build<EventBase>( type );
 }
 
 EventBase::EventBase()

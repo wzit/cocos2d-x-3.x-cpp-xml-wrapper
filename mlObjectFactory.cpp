@@ -9,7 +9,7 @@
  */
 /******************************************************************************/
 
-#include "ObjectFactory.h"
+#include "mlObjectFactory.h"
 #include "Events.h"
 #include "ScrollMenu.h"
 #include "MenuItem.h"
@@ -18,7 +18,7 @@
 #include "Text.h"
 NS_CC_BEGIN;
 
-Factory::Factory()
+mlObjectFactory::mlObjectFactory()
 {
 	book<Node>("node");
 	book<Sprite>( "sprite" );
@@ -47,11 +47,11 @@ Factory::Factory()
 	book<EventStatisticAccumulate>( "statistic_accumulate" );
 }
 
-IntrusivePtr<cocos2d::Ref> Factory::build( const std::string & key )
+IntrusivePtr<cocos2d::Ref> mlObjectFactory::build( const std::string & key )
 {
 	bool isreg = m_objects.find( key ) != m_objects.end();
 	if( !isreg )
-		log( "Factory say: type [%s] not registred", key.c_str() );
+		log( "mlObjectFactory say: type [%s] not registred", key.c_str() );
 	assert( isreg );
 	return isreg ? m_objects[key]->build() : nullptr;
 };

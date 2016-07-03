@@ -17,57 +17,49 @@
 //
 //
 
-#include "appgratis.h"
+#include "ml/services/appgratis/appgratis.h"
 
+NS_CC_BEGIN;
 
-namespace appgratis
-{
+namespace appgratis {
 	std::mutex _mutex;
-	std::map< std::string, Offer > _queue;
+	std::map <std::string, appgratis::Offer> _queue;
 	Callback _callback;
-	
-	
-	void setCallback( Callback callback )
-	{
+
+
+	void setCallback(Callback callback) {
 		_callback = callback;
 		push();
 	}
-	
-	void push()
-	{
+
+	void push() {
 		_mutex.lock();
-		if(_callback )
-		{
-			for( auto iter = _queue.begin(); iter != _queue.end(); )
-			{
-				if( iter->second.complited )
-				{
-					_callback( iter->second );
-					_queue.erase( iter++ );
+		if (_callback) {
+			for (auto iter = _queue.begin(); iter != _queue.end();) {
+				if (iter->second.complited) {
+					_callback(iter->second);
+					_queue.erase(iter++);
 				}
-				else
-				{
+				else {
 					++iter;
 				}
 			}
 		}
 		_mutex.unlock();
 	}
-	
-	void onRedeemResource( const std::string& name, const std::string& res, int count )
-	{
+
+	void onRedeemResource(const std::string &name, const std::string &res, int count) {
 		_mutex.lock();
-		Offer& offer = _queue[name];
+		Offer &offer = _queue[name];
 		offer.name = name;
 		offer.resources[res] = count;
 		_mutex.unlock();
 	}
-	
-	void onRedeemOffer( Offer offer )
-	{
+
+	void onRedeemOffer(Offer offer) {
 		{
 			_mutex.lock();
-			Offer& off = _queue[offer.name];
+			Offer &off = _queue[offer.name];
 			off.name = offer.name;
 			off.params = offer.params;
 			off.complited = true;
@@ -75,5 +67,6 @@ namespace appgratis
 		}
 		push();
 	}
-
 }
+
+NS_CC_END;

@@ -147,7 +147,6 @@
     <ClCompile Include="MenuItem.cpp" />
     <ClCompile Include="mlUserData.cpp" />
     <ClCompile Include="NodeExt.cpp" />
-    <ClCompile Include="ObjectFactory.cpp" />
     <ClCompile Include="Panel.cpp" />
     <ClCompile Include="ParamCollection.cpp" />
     <ClCompile Include="ScrollMenu.cpp" />
@@ -158,6 +157,7 @@
     <ClCompile Include="LayerBlur.cpp" />
     <ClCompile Include="Generics.cpp" />
     <ClCompile Include="ScoreCounter.cpp" />
+    <ClCompile Include="mlObjectFactory.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Audio\AudioEngine.h">
@@ -242,7 +242,6 @@
     <ClInclude Include="MenuItem.h" />
     <ClInclude Include="mlUserData.h" />
     <ClInclude Include="NodeExt.h" />
-    <ClInclude Include="ObjectFactory.h" />
     <ClInclude Include="Observer.h" />
     <ClInclude Include="Panel.h" />
     <ClInclude Include="ParamCollection.h" />
@@ -261,5 +260,6 @@
     <ClInclude Include="LayerBlur.h" />
     <ClInclude Include="Generics.h" />
     <ClInclude Include="ScoreCounter.h" />
+    <ClInclude Include="mlObjectFactory.h" />
   </ItemGroup>
 </Project>

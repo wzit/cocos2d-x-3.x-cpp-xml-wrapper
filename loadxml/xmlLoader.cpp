@@ -10,7 +10,7 @@
 /******************************************************************************/
 
 #include "common.h"
-#include "ObjectFactory.h"
+#include "../mlObjectFactory.h"
 #include "Events.h"
 #include "ScrollMenu.h"
 #include "Animation.h"
@@ -34,9 +34,9 @@ namespace xmlLoader
 
 	XmlDocPointer getDoc(const std::string& path)
 	{
-#if( CC_TARGET_PLATFORM == CC_PLATFORM_WIN32 )
+//#if( CC_TARGET_PLATFORM == CC_PLATFORM_WIN32 )
 		return loadDoc( IniFile, path );
-#endif
+//#endif
 		auto iter = _cache.find( path );
 		if( iter == _cache.end() )
 		{
@@ -78,6 +78,7 @@ namespace xmlLoader
 
 	NodePointer load_node( const std::string & file, const std::string& topType, int depth )
 	{
+		log( "load node from doc [%s]", file.c_str() );
 		auto doc = getDoc( file );
 		auto root = doc->root().first_child();
 		NodePointer result = root ? load_node( root, topType, depth ) : nullptr;
@@ -86,6 +87,11 @@ namespace xmlLoader
 
 	IntrusivePtr<Node> load_node( pugi::xml_node xmlnode, const std::string& topType, int depth )
 	{
+		if( !xmlnode )
+		{
+			log( "warning: try loading node from emptt xmlnode" );
+		}
+
 		ParamCollection macroses( xmlnode.attribute( "macroses" ).as_string() );
 		xmlnode.remove_attribute( "macroses" );
 		for( auto pair : macroses )
@@ -97,9 +103,17 @@ namespace xmlLoader
 		IntrusivePtr<Node> result;
 		if( template_.empty() )
 		{
-			result = Factory::shared().build<Node>( type );
-			if( result )
-				load( result.ptr(), xmlnode, depth );
+			if( type.empty() == false )
+			{
+				log( "try create object [%s]", type.c_str() );
+				result = cocos2d::mlObjectFactory::shared().build<Node>( type );
+				if( result )
+					load( result.ptr(), xmlnode, depth );
+			}
+			else
+			{
+				log( "warning: try loading node with empty type" );
+			}
 		}
 		else
 		{
@@ -117,6 +131,7 @@ namespace xmlLoader
 
 	void load( Node* node, const std::string & path, int depth )
 	{
+		log( "load from doc [%s]", path.c_str() );
 		pugi::xml_document *doc( nullptr );
 		doc = new pugi::xml_document;
 		doc->load_file( path.c_str() );
@@ -259,7 +274,8 @@ namespace xmlLoader
 		}
 		if( child == nullptr )
 		{
-			child = Factory::shared().build<Node>( type );
+			log( "try create child [%s]", type.c_str() );
+			child = mlObjectFactory::shared().build<Node>( type );
 		}
 		if( !child )
 		{

@@ -181,7 +181,7 @@
     <ClCompile Include="MenuItem.cpp" />
     <ClCompile Include="mlUserData.cpp" />
     <ClCompile Include="NodeExt.cpp" />
-    <ClCompile Include="ObjectFactory.cpp" />
+    <ClCompile Include="mlObjectFactory.cpp" />
     <ClCompile Include="Panel.cpp" />
     <ClCompile Include="ParamCollection.cpp" />
     <ClCompile Include="pugixml\pugixml.cpp" />
@@ -230,7 +230,7 @@
     <ClInclude Include="MenuItem.h" />
     <ClInclude Include="mlUserData.h" />
     <ClInclude Include="NodeExt.h" />
-    <ClInclude Include="ObjectFactory.h" />
+    <ClInclude Include="mlObjectFactory.h" />
     <ClInclude Include="Observer.h" />
     <ClInclude Include="Panel.h" />
     <ClInclude Include="ParamCollection.h" />

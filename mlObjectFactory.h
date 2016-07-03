@@ -9,18 +9,18 @@
  */
 /******************************************************************************/
 
-#ifndef __ObjectFactory_h__
-#define __ObjectFactory_h__
+#ifndef __mlObjectFactory_h__
+#define __mlObjectFactory_h__
 #include "Singlton.h"
 #include "macroses.h"
 NS_CC_BEGIN;
 
 
-class Factory : public Singlton<Factory>
+class mlObjectFactory : public Singlton<mlObjectFactory>
 {
 private:
-	friend class Singlton<Factory>;
-	Factory();
+	friend class Singlton<mlObjectFactory>;
+	mlObjectFactory();
 
 	class IObject : public cocos2d::Ref {
 	public: virtual IntrusivePtr<cocos2d::Ref> build()=0;
