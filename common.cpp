@@ -924,7 +924,7 @@ float calculate( const std::string& expression, const std::map<std::string, floa
 	};
 	if( args.size() == 1 )
 	{
-		return args.front().find_first_of( "+-*=" ) == -1 ?
+		return args.front().find_first_of( "+-*=<>" ) == -1 ?
 			value( args.front() ) :
 			calculate( args.front(), constants, "*/" );
 	}
@@ -938,12 +938,114 @@ float calculate( const std::string& expression, const std::map<std::string, floa
 		if( ops[index] == '-' ) result -= r;
 		if( ops[index] == '*' ) result *= r;
 		if( ops[index] == '/' ) result /= r;
+		if( ops[index] == '<' ) 
+			result = result < r;
+		if( ops[index] == '>' )
+			result = result> r;
 		++index;
 	}
 	return result;
 }
 
+//float calculate( const std::string& expression, const std::map<std::string, float>& constants )
+//{
+//	return calculate( expression, constants, "+-<>" );
+//}
+
+
 float calculate( const std::string& expression, const std::map<std::string, float>& constants )
 {
-	return calculate( expression, constants, "+-" );
+	/*
+	1. Ищем самые глубокие скобки, заменяем их на вычисленное выражение
+	2. Разворачиваем выражение, убирая скобки до тех пор, пока они встречаются
+	3. Вычисляя значения скобок, проряется, не функция ли это, вычисляется соответствующаяя функция
+	4. вычисляем оставшееся выражение (должны остаться простые знаки - +-*.)
+	*/
+	std::string exp = expression;
+
+	auto find_brackets = []( const std::string&exp, int pos, int& l, int& r )
+	{
+		l = r = -1;
+		for( size_t i = pos; i < exp.size(); ++i )
+		{
+			if( exp[i] == '(' )
+				l = i;
+			if( exp[i] == ')' )
+			{
+				assert( l != -1 );
+				r = i;
+				break;
+			}
+		}
+		assert( l == -1 ? r == -1 : true );
+		assert( l != -1 ? r != -1 : true );
+		assert( l != -1 ? r > l : true );
+		if( l != -1 && r != -1 )
+		{
+			return exp.substr( l + 1, r - l - 1 );
+		}
+		return std::string( "" );
+	};
+	auto check_function = []( const std::string&exp, const std::string& brackets, int l, int r )
+	{
+		std::string function;
+		int i = l - 1;
+		for( ; i >= 0; --i )
+		{
+			std::string ops( "+-*/;(<>" );
+			if( ops.find( exp[i] ) != -1 )
+			{
+				break;
+			}
+		}
+		function = exp.substr( i + 1, l - i - 1 );
+		if( function.empty() ) return function;
+		if( function == "max" ) return function;
+		if( function == "min" ) return function;
+		if( function == "rand" ) return function;
+		assert( 0 );
+		function.clear();
+		return function;
+	};
+
+	auto func_minmax = [constants]( const std::string& exp, bool max )
+	{
+		int k = exp.find( ";" );
+		assert( k != -1 && k != 0 && k != exp.size() - 1 );
+		auto a = calculate( exp.substr( 0, k ), constants );
+		auto b = calculate( exp.substr( k + 1 ), constants );
+		std::string result = toStr( max ? std::max( a, b ) : std::min( a, b ) );
+		return result;
+	};
+	auto func_rand = [constants]( const std::string& exp )
+	{
+		int k = exp.find( ";" );
+		assert( k != -1 && k != 0 && k != exp.size() - 1 );
+		auto a = calculate( exp.substr( 0, k ), constants );
+		auto b = calculate( exp.substr( k + 1 ), constants );
+		auto random = CCRANDOM_0_1() * (b - a) + a;
+		return toStr( random );
+	};
+
+	do
+	{
+		int l, r;
+		std::string e = find_brackets( exp, 0, l, r );
+		if( l == -1 || r == -1 )
+			break;
+		auto func = check_function( exp, e, l, r );
+		if( func == "max" ) e = func_minmax( e, true );
+		if( func == "min" ) e = func_minmax( e, false );
+		if( func == "rand" ) e = func_rand( e );
+		e = toStr( calculate( e, constants ) );
+		l = l - func.size();
+		r = r + 1;
+		auto a = exp.substr( 0, l );
+		auto b = exp.substr( r );
+		exp = a + e + b;
+	}
+	while( true );
+
+	const std::string operators = "+-<>";
+	return calculate( exp, constants, operators );
 }

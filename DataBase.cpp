@@ -132,6 +132,9 @@ void DataBase::_checkAndLog( const std::string& table, const std::string& row, u
 
 void DataBase::onCreate()
 {
+	xmlLoader::macros::set( "lt", "<" );
+	xmlLoader::macros::set( "rt", ">" );
+
 	auto doc = xmlLoader::getDoc( "ini/database.xml" );
 	auto root = doc->root().first_child();
 	for( auto xmltable = root.first_child(); xmltable; xmltable = xmltable.next_sibling() )
@@ -150,6 +153,7 @@ void DataBase::onCreate()
 			char divider( ' ' );
 			if( text.find( "\t" ) != std::string::npos )
 				divider = '\t';
+			text = xmlLoader::macros::parse( text );
 			split( svalues, text, divider );
 
 			for( auto value : svalues )
@@ -160,6 +164,9 @@ void DataBase::onCreate()
 			}
 		}
 	}
+
+	xmlLoader::macros::erase( "lt" );
+	xmlLoader::macros::erase( "rt" );
 }
 
 NS_CC_END
