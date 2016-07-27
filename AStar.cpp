@@ -39,7 +39,7 @@ namespace AStar
 			support::remove( openset, c );
 			support::add( closedset, c );
 
-			Map::Cells neighbors = map.neighbors( c );
+			Map::Cells neighbors = map.neighbors( c, goal );
 			for( auto n : neighbors )
 			{
 				auto exist = support::exist( closedset, n );
@@ -90,6 +90,8 @@ namespace AStar
 		}
 
 		std::reverse( path_map.begin(), path_map.end() );
+		if( goal->isPassed() == false )
+			support::remove( path_map, goal );
 		return path_map;
 	}
 
@@ -119,7 +121,7 @@ namespace AStar
 		return _data[row * _cols + col];
 	}
 
-	Map::Cells Map::neighbors( Cell_ptr cell )
+	Map::Cells Map::neighbors( Cell_ptr cell, Cell_ptr goal )
 	{
 		Cells Cells;
 
@@ -138,6 +140,12 @@ namespace AStar
 		{
 			int row = cell->_row + c[0];
 			int col = cell->_col + c[1];
+			if( row == goal->row() && col == goal->col() )
+			{
+				auto cell = _data[row * _cols + col];
+				Cells.push_back( cell );
+				break;
+			}
 			if( row < 0 || row > _rows - 1 ) continue;
 			if( col < 0 || col > _cols - 1 ) continue;
 			auto cell = _data[row * _cols + col];
@@ -152,7 +160,7 @@ namespace AStar
 	{
 		int r = a->_row - b->_row;
 		int c = a->_col - b->_col;
-		return float( r*r + c*c );
+		return std::sqrt(float( r*r + c*c ));
 	}
 
 	void Map::clearCells()
@@ -189,7 +197,8 @@ namespace AStar
 	void support::remove( Map::Cells & Cells, Map::Cell_ptr cell )
 	{
 		auto i = std::find( Cells.begin(), Cells.end(), cell );
-		if( i != Cells.end() ) Cells.erase( i );
+		if( i != Cells.end() ) 
+			Cells.erase( i );
 	}
 
 	void support::add( Map::Cells & Cells, Map::Cell_ptr cell )

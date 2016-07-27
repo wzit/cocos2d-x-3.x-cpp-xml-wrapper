@@ -33,7 +33,7 @@ namespace AStar
 		Map( int rows, int cols );
 		~Map();
 		Cell_ptr cell( int row, int col );
-		Cells neighbors( Cell_ptr cell );
+		Cells neighbors( Cell_ptr cell, Cell_ptr goal );
 		float heuristic_cost_estimate( Cell_ptr a, Cell_ptr b );
 		void clearCells();
 	private:
