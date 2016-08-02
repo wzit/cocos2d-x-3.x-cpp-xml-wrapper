@@ -14,6 +14,7 @@
 #include <map>
 #include <string>
 #include "cocos2d.h"
+#include "Generics.h"
 
 class ParamCollection : public std::map<std::string, std::string>
 {
@@ -84,6 +85,12 @@ public:
 	{
 		auto iter = find( name );
 		return iter != end() ? iter->second : defaultValue;
+	}
+
+	template <class T>
+	const T get( const std::string & name, const std::string & defaultValue = "" )const
+	{
+		return cocos2d::strTo<T>( get( name, defaultValue ) );
 	}
 
 	const void set( const std::string & name, const std::string & value, bool rewrite = true )
