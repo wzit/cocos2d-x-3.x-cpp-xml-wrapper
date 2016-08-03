@@ -67,10 +67,10 @@ int DataBase::getIndex( const std::string& table, const std::string& row, const 
 	for( auto& value : iRow->second )
 	{
 		if( value == parameter )
-			break;
+			return index;
 		++index;
 	}
-	return index;
+	return -1;
 }
 
 template <> bool DataBase::get( const std::string& table, const std::string& row, unsigned index )const
