@@ -76,6 +76,15 @@ std::string unite( const STLcont & cont, const char delimiter = ',' )
 void split( std::list<std::string> & out, const std::string & values, const char delimiter = ',' );
 void split( std::vector<std::string> & out, const std::string & values, const char delimiter = ',' );
 
+template <typename T>
+void split_t( std::vector<T> & out, const std::string & values, const char delimiter = ',' )
+{
+	std::vector<std::string> ss;
+	split( ss, values, delimiter );
+	for( auto& s : ss )
+		out.push_back( cocos2d::strTo<T>( s ) );
+}
+
 bool strToBool( const std::string &value );
 std::string boolToStr( bool value );
 
