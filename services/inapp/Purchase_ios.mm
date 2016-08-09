@@ -86,7 +86,7 @@ void inapp::requestDetails( const std::string & productID )
 		inapp::SkuDetails details;
 
 		details.priceValue = product.price;;
-		details.priceText = product.currency + ":" + toStr(product.price);
+		details.priceText = product.currency + ":" + cocos2d::toStr(product.price);
 		details.productId = product.identifier;
 		details.description = product.description;
 		details.title = product.title;

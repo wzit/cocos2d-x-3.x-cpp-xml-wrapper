@@ -25,14 +25,14 @@ namespace batch
 {
 	void OnRedeemResource( const std::string& name, const std::string& resource, int count )
 	{
-		appgratis::onRedeemResource( name, resource, count );
+		cocos2d::appgratis::onRedeemResource( name, resource, count );
 	}
 	
 	void OnRedeemOffer( const std::string& name, const std::string& params )
 	{
-		appgratis::Offer offer;
+		cocos2d::appgratis::Offer offer;
 		offer.name = name;
 		offer.params = ParamCollection( params );
-		appgratis::onRedeemOffer( offer );
+		cocos2d::appgratis::onRedeemOffer( offer );
 	}
 }
