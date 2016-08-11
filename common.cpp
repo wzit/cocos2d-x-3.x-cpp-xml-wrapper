@@ -1003,6 +1003,9 @@ float calculate( const std::string& expression, const std::map<std::string, floa
 		if( function == "max" ) return function;
 		if( function == "min" ) return function;
 		if( function == "rand" ) return function;
+		if( function == "sqrt" ) return function;
+		if( function == "fibonacci" ) return function;
+		if( function == "int" ) return function;
 		assert( 0 );
 		function.clear();
 		return function;
@@ -1026,6 +1029,32 @@ float calculate( const std::string& expression, const std::map<std::string, floa
 		auto random = CCRANDOM_0_1() * (b - a) + a;
 		return toStr( random );
 	};
+	auto func_sqrt = [constants]( const std::string& exp )
+	{
+		auto a = calculate( exp, constants );
+		return toStr( std::sqrt( a ) );
+	};
+	auto func_int = [constants]( const std::string& exp )
+	{
+		auto a = static_cast<int>(calculate( exp, constants ));
+		return toStr( a );
+	};
+	auto func_fibonacci = [constants]( const std::string& exp )
+	{
+		int a = 1;
+		int b = 1;
+		int arg = calculate( exp, constants );
+		int result = b;
+		while( arg > 2 )
+		{
+			--arg;
+			int c = a+b;
+			a = b;
+			b = c;
+			result = c;
+		}
+		return toStr( result );
+	};
 
 	do
 	{
@@ -1035,8 +1064,11 @@ float calculate( const std::string& expression, const std::map<std::string, floa
 			break;
 		auto func = check_function( exp, e, l, r );
 		if( func == "max" ) e = func_minmax( e, true );
-		if( func == "min" ) e = func_minmax( e, false );
-		if( func == "rand" ) e = func_rand( e );
+		else if( func == "min" ) e = func_minmax( e, false );
+		else if( func == "rand" ) e = func_rand( e );
+		else if( func == "sqrt" ) e = func_sqrt( e );
+		else if( func == "fibonacci" ) e = func_fibonacci( e );
+		else if( func == "int" ) e = func_int( e );
 		e = toStr( calculate( e, constants ) );
 		l = l - func.size();
 		r = r + 1;
