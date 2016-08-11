@@ -1006,6 +1006,7 @@ float calculate( const std::string& expression, const std::map<std::string, floa
 		if( function == "sqrt" ) return function;
 		if( function == "fibonacci" ) return function;
 		if( function == "int" ) return function;
+		if( function == "triangular" ) return function;
 		assert( 0 );
 		function.clear();
 		return function;
@@ -1055,6 +1056,16 @@ float calculate( const std::string& expression, const std::map<std::string, floa
 		}
 		return toStr( result );
 	};
+	auto func_triangular = [constants]( const std::string& exp )
+	{
+		int arg = (int)calculate( exp, constants );
+		int result( 1 );
+		for( int i = 1; i <= arg; ++i )
+		{
+			result += i;
+		}
+		return toStr(result);
+	};
 
 	do
 	{
@@ -1069,6 +1080,7 @@ float calculate( const std::string& expression, const std::map<std::string, floa
 		else if( func == "sqrt" ) e = func_sqrt( e );
 		else if( func == "fibonacci" ) e = func_fibonacci( e );
 		else if( func == "int" ) e = func_int( e );
+		else if( func == "triangular" ) e = func_triangular( e );
 		e = toStr( calculate( e, constants ) );
 		l = l - func.size();
 		r = r + 1;
